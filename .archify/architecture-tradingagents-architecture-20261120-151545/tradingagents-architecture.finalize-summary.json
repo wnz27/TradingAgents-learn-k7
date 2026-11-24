@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "ok": false,
+  "command": "finalize",
+  "status": "fail",
+  "type": "architecture",
+  "quality": "showcase",
+  "specification": {
+    "path": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/candidate.json",
+    "sha256": "4fd92c9bc7ec0047b19becbb584efad1e09e522037c5af8f6c70acbf61c53c81",
+    "bytes": 13010
+  },
+  "artifact": {
+    "path": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/tradingagents-architecture.html",
+    "sha256": "f48f713fd993e36252b6e443724708d67783dc4dfc701ee5aa65421bcc7855e8",
+    "bytes": 868953
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "fail"
+  },
+  "failedStage": "browser-check",
+  "diagnostics": [
+    {
+      "code": "viewer/browser-check-runtime",
+      "severity": "error",
+      "message": "browser-check could not complete its Chrome inspection.",
+      "subject": {
+        "artifact": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/tradingagents-architecture.html"
+      },
+      "evidence": {
+        "reason": "Chrome DevTools read pipe failed: stream ended\nChrome process: still running.\nChrome transport: Node v20.20.2, libuv 1.46.0, darwin; pid=67142, exitCode=null, signalCode=null.\nChrome read pipe: readable=false, ended=true, destroyed=false, receivedBytes=0, messages=0, bufferedBytes=0.\nChrome write pipe: writable=true, ended=false, destroyed=false, completedWrites=1, writtenBytes=50, bufferedBytes=0."
+      },
+      "supportedFixes": [
+        "resolve the reported Chrome inspection error, then rerun browser-check"
+      ]
+    }
+  ],
+  "diagnosticSummary": {
+    "total": 1,
+    "shown": 1,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/tradingagents-architecture.finalize.json",
+    "summaryReceipt": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/tradingagents-architecture.finalize-summary.json",
+    "browserCheckReceipt": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/tradingagents-architecture.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-11-19T16:08:14.332Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 7081,
+  "browserCheck": {
+    "requested": true,
+    "ran": false
+  }
+}

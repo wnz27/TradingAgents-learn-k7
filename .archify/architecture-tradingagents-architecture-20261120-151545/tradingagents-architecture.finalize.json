@@ -1,0 +1,382 @@
+{
+  "schemaVersion": 1,
+  "ok": false,
+  "command": "finalize",
+  "status": "fail",
+  "type": "architecture",
+  "quality": "showcase",
+  "startedAt": "2026-11-20T07:17:45.067Z",
+  "specification": {
+    "path": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/candidate.json",
+    "sha256": "4fd92c9bc7ec0047b19becbb584efad1e09e522037c5af8f6c70acbf61c53c81",
+    "bytes": 13010
+  },
+  "artifact": {
+    "path": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/tradingagents-architecture.html",
+    "sha256": "f48f713fd993e36252b6e443724708d67783dc4dfc701ee5aa65421bcc7855e8",
+    "bytes": 868953
+  },
+  "stages": {
+    "validate": {
+      "status": "pass",
+      "exitCode": 0,
+      "durationMs": null,
+      "execution": "embedded-in-deliver",
+      "command": [
+        "/Users/f27/.nvm/versions/node/v20.20.2/bin/node",
+        "/Users/f27/.agents/skills/archify/bin/archify.mjs",
+        "deliver",
+        "architecture",
+        "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/candidate.json",
+        "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/tradingagents-architecture.html",
+        "--quality",
+        "showcase",
+        "--repo-root",
+        "/Users/f27/learn/fin_ai/TradingAgents-learn-k7",
+        "--json"
+      ],
+      "receipt": {
+        "schemaVersion": 1,
+        "ok": true,
+        "command": "validate",
+        "specification": {
+          "sha256": "4fd92c9bc7ec0047b19becbb584efad1e09e522037c5af8f6c70acbf61c53c81",
+          "bytes": 13010
+        },
+        "validation": {
+          "checksPassed": 9,
+          "checkCount": 9,
+          "compositionProfile": "showcase",
+          "compositionStatus": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    "deliver": {
+      "status": "pass",
+      "exitCode": 0,
+      "durationMs": 1295,
+      "command": [
+        "/Users/f27/.nvm/versions/node/v20.20.2/bin/node",
+        "/Users/f27/.agents/skills/archify/bin/archify.mjs",
+        "deliver",
+        "architecture",
+        "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/candidate.json",
+        "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/tradingagents-architecture.html",
+        "--quality",
+        "showcase",
+        "--repo-root",
+        "/Users/f27/learn/fin_ai/TradingAgents-learn-k7",
+        "--json"
+      ],
+      "receipt": {
+        "schemaVersion": 1,
+        "receiptId": "ac57abe6-8975-4270-8e1d-be5bdae15937",
+        "ok": true,
+        "command": "deliver",
+        "type": "architecture",
+        "input": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/candidate.json",
+        "output": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/tradingagents-architecture.html",
+        "specification": {
+          "sha256": "4fd92c9bc7ec0047b19becbb584efad1e09e522037c5af8f6c70acbf61c53c81",
+          "bytes": 13010
+        },
+        "artifact": {
+          "sha256": "f48f713fd993e36252b6e443724708d67783dc4dfc701ee5aa65421bcc7855e8",
+          "bytes": 868953
+        },
+        "validation": {
+          "checksPassed": 9,
+          "checkCount": 9,
+          "compositionProfile": "showcase",
+          "compositionStatus": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "evidence": {
+          "verified": true,
+          "repository": "https://github.com/wnz27/TradingAgents-learn-k7",
+          "revision": "9fa1196fffbcfd9de5146d2dd2869df84ab99838",
+          "references": 40
+        },
+        "update": {
+          "status": "unavailable",
+          "installedVersion": null,
+          "availableVersion": null,
+          "releaseNotes": null,
+          "checkedAt": null,
+          "source": null,
+          "noticeRequired": false,
+          "noticeText": null,
+          "reason": "disabled"
+        }
+      }
+    },
+    "check": {
+      "status": "pass",
+      "exitCode": 0,
+      "durationMs": 169,
+      "command": [
+        "/Users/f27/.nvm/versions/node/v20.20.2/bin/node",
+        "/Users/f27/.agents/skills/archify/bin/archify.mjs",
+        "check",
+        "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/tradingagents-architecture.html",
+        "--require-provenance"
+      ],
+      "receipt": {
+        "ok": true,
+        "file": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/tradingagents-architecture.html",
+        "artifact": {
+          "sha256": "f48f713fd993e36252b6e443724708d67783dc4dfc701ee5aa65421bcc7855e8",
+          "bytes": 868953
+        },
+        "checks": [
+          {
+            "name": "single_svg",
+            "ok": true,
+            "details": [
+              "found 1 <svg> block(s)"
+            ]
+          },
+          {
+            "name": "finite_svg",
+            "ok": true,
+            "details": []
+          },
+          {
+            "name": "orthogonal_arrows",
+            "ok": true,
+            "details": []
+          },
+          {
+            "name": "label_route_clearance",
+            "ok": true,
+            "details": []
+          },
+          {
+            "name": "relationship_crossings",
+            "ok": true,
+            "details": []
+          },
+          {
+            "name": "relationship_corridors",
+            "ok": true,
+            "details": []
+          },
+          {
+            "name": "container_border_runs",
+            "ok": true,
+            "details": []
+          },
+          {
+            "name": "route_rhythm",
+            "ok": true,
+            "details": []
+          },
+          {
+            "name": "legend_clearance",
+            "ok": true,
+            "details": []
+          }
+        ],
+        "composition": {
+          "schemaVersion": 1,
+          "profile": "showcase",
+          "status": "pass",
+          "summary": {
+            "errors": 0,
+            "warnings": 0
+          },
+          "metrics": {
+            "properCrossings": 0,
+            "resolvedCrossovers": 0,
+            "ambiguousCorridors": 0,
+            "arrowheadCollisions": 0,
+            "containerBorderRuns": 0,
+            "labelRouteClearanceIssues": 0,
+            "labelCanvasOverflowIssues": 0,
+            "minLabelRouteClearance": 21.1,
+            "desktopReadabilityIssues": 0,
+            "viewportHeightIssues": 0,
+            "minProjectedNodeTextPx": 7.5,
+            "maxBends": 2,
+            "routesOverSuggestedBends": 0,
+            "maxStretch": 1,
+            "routesOverSuggestedStretch": 0,
+            "minSegmentPx": 36.5,
+            "minInteriorSegmentPx": 143,
+            "shortSegmentCount": 0,
+            "shortEndpointSegmentCount": 0,
+            "shortInteriorSegmentCount": 0,
+            "microSegmentCount": 0
+          },
+          "suggestedLimits": {
+            "bendsPerRelationship": 2,
+            "stretch": 1.35,
+            "segmentPx": 16,
+            "microSegmentPx": 8
+          },
+          "routeReview": {
+            "crossings": [],
+            "detours": []
+          },
+          "leadingSpace": {
+            "measured": true,
+            "emptyTopPx": 40,
+            "emptyTopRatio": 0.067,
+            "occupiedTop": 40,
+            "viewBoxTop": 0,
+            "canvasHeight": 598,
+            "typicalNodeHeight": 62,
+            "reviewSuggested": false
+          },
+          "desktopReadability": {
+            "budgetBasis": "recognized-declared-wide",
+            "readerContract": "declared-wide-v1",
+            "availableDiagramWidth": 1227.2727272727273,
+            "actualBudgetPx": 1227.2727272727273,
+            "actualReaderWidth": 1257.2727272727273,
+            "desiredReaderWidth": 1257.2727272727273,
+            "viewportCap": 1376,
+            "limit": "source-size",
+            "requestedTargetPx": 7.5,
+            "requestedTargetMet": true,
+            "hardFloorPx": 6,
+            "hardFloorMet": true,
+            "minimumOwner": {
+              "kind": "node",
+              "id": "backtest"
+            },
+            "minimumSourceTextPx": 7.7,
+            "minimumProjectedTextPx": 7.5,
+            "semanticTextCount": 45
+          },
+          "issues": []
+        },
+        "provenance": "current",
+        "deliveryReceiptId": "ac57abe6-8975-4270-8e1d-be5bdae15937"
+      }
+    },
+    "browser-check": {
+      "status": "fail",
+      "exitCode": 1,
+      "durationMs": 5364,
+      "command": [
+        "/Users/f27/.nvm/versions/node/v20.20.2/bin/node",
+        "/Users/f27/.agents/skills/archify/bin/archify.mjs",
+        "browser-check",
+        "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/tradingagents-architecture.html",
+        "--json",
+        "--require-provenance"
+      ],
+      "execution": "in-process",
+      "receipt": {
+        "schemaVersion": 1,
+        "ok": false,
+        "command": "browser-check",
+        "evidenceKind": "automated-browser",
+        "status": "fail",
+        "visualReview": "not-requested",
+        "provenance": "current",
+        "deliveryReceiptId": "ac57abe6-8975-4270-8e1d-be5bdae15937",
+        "artifact": {
+          "path": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/tradingagents-architecture.html",
+          "sha256": "f48f713fd993e36252b6e443724708d67783dc4dfc701ee5aa65421bcc7855e8",
+          "bytes": 868953
+        },
+        "state": {
+          "detail": "read",
+          "motion": "still"
+        },
+        "chrome": {
+          "status": "available",
+          "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        },
+        "diagnostics": [
+          {
+            "code": "viewer/browser-check-runtime",
+            "severity": "error",
+            "message": "browser-check could not complete its Chrome inspection.",
+            "subject": {
+              "artifact": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/tradingagents-architecture.html"
+            },
+            "evidence": {
+              "reason": "Chrome DevTools read pipe failed: stream ended\nChrome process: still running.\nChrome transport: Node v20.20.2, libuv 1.46.0, darwin; pid=67142, exitCode=null, signalCode=null.\nChrome read pipe: readable=false, ended=true, destroyed=false, receivedBytes=0, messages=0, bufferedBytes=0.\nChrome write pipe: writable=true, ended=false, destroyed=false, completedWrites=1, writtenBytes=50, bufferedBytes=0."
+            },
+            "supportedFixes": [
+              "resolve the reported Chrome inspection error, then rerun browser-check"
+            ]
+          }
+        ],
+        "containment": {
+          "status": "fail",
+          "policy": "fit-or-reader-declared-readable-vertical-scroll",
+          "viewports": []
+        },
+        "themeStates": {
+          "status": "fail",
+          "viewports": []
+        },
+        "readability": {
+          "status": "fail",
+          "minimumProjectedNodeTextPx": 6,
+          "viewports": []
+        },
+        "viewerChrome": {
+          "status": "fail",
+          "viewports": []
+        },
+        "captures": {
+          "status": "not-requested",
+          "screenshots": [],
+          "contactSheet": null
+        },
+        "sidecars": {
+          "receipt": "tradingagents-architecture.browser-check.json",
+          "files": []
+        },
+        "error": "Chrome DevTools read pipe failed: stream ended\nChrome process: still running.\nChrome transport: Node v20.20.2, libuv 1.46.0, darwin; pid=67142, exitCode=null, signalCode=null.\nChrome read pipe: readable=false, ended=true, destroyed=false, receivedBytes=0, messages=0, bufferedBytes=0.\nChrome write pipe: writable=true, ended=false, destroyed=false, completedWrites=1, writtenBytes=50, bufferedBytes=0."
+      }
+    }
+  },
+  "browserCheck": {
+    "requested": true,
+    "ran": false
+  },
+  "diagnostics": [
+    {
+      "code": "viewer/browser-check-runtime",
+      "severity": "error",
+      "message": "browser-check could not complete its Chrome inspection.",
+      "subject": {
+        "artifact": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/tradingagents-architecture.html"
+      },
+      "evidence": {
+        "reason": "Chrome DevTools read pipe failed: stream ended\nChrome process: still running.\nChrome transport: Node v20.20.2, libuv 1.46.0, darwin; pid=67142, exitCode=null, signalCode=null.\nChrome read pipe: readable=false, ended=true, destroyed=false, receivedBytes=0, messages=0, bufferedBytes=0.\nChrome write pipe: writable=true, ended=false, destroyed=false, completedWrites=1, writtenBytes=50, bufferedBytes=0."
+      },
+      "supportedFixes": [
+        "resolve the reported Chrome inspection error, then rerun browser-check"
+      ]
+    }
+  ],
+  "evidence": {
+    "receipt": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/tradingagents-architecture.finalize.json",
+    "summaryReceipt": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/tradingagents-architecture.finalize-summary.json",
+    "browserCheckReceipt": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/tradingagents-architecture.browser-check.json"
+  },
+  "visualReview": "not-requested",
+  "failedStage": "browser-check",
+  "finishedAt": "2026-11-20T07:17:52.148Z",
+  "durationMs": 7081,
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-11-19T16:08:14.332Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  }
+}

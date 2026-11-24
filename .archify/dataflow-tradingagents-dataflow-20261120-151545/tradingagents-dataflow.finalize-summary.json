@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "ok": false,
+  "command": "finalize",
+  "status": "fail",
+  "type": "dataflow",
+  "quality": "showcase",
+  "specification": {
+    "path": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/candidate.json",
+    "sha256": "77ed10b7e029bed20c7563a3bece0b754d798173e97478474662a9b8e6ac0b24",
+    "bytes": 11774
+  },
+  "artifact": {
+    "path": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/tradingagents-dataflow.html",
+    "sha256": "22177c5069b3d88b49c41b52688d0d65ebec60298c367b6da77113c2a95a0a14",
+    "bytes": 859650
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "fail"
+  },
+  "failedStage": "browser-check",
+  "diagnostics": [
+    {
+      "code": "viewer/browser-check-runtime",
+      "severity": "error",
+      "message": "browser-check could not complete its Chrome inspection.",
+      "subject": {
+        "artifact": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/tradingagents-dataflow.html"
+      },
+      "evidence": {
+        "reason": "Chrome DevTools read pipe failed: stream ended\nChrome process: still running.\nChrome transport: Node v20.20.2, libuv 1.46.0, darwin; pid=67143, exitCode=null, signalCode=null.\nChrome read pipe: readable=false, ended=true, destroyed=false, receivedBytes=0, messages=0, bufferedBytes=0.\nChrome write pipe: writable=true, ended=false, destroyed=false, completedWrites=1, writtenBytes=50, bufferedBytes=0."
+      },
+      "supportedFixes": [
+        "resolve the reported Chrome inspection error, then rerun browser-check"
+      ]
+    }
+  ],
+  "diagnosticSummary": {
+    "total": 1,
+    "shown": 1,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/tradingagents-dataflow.finalize.json",
+    "summaryReceipt": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/tradingagents-dataflow.finalize-summary.json",
+    "browserCheckReceipt": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/tradingagents-dataflow.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-11-19T16:08:14.332Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 7080,
+  "browserCheck": {
+    "requested": true,
+    "ran": false
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "dataflow",
+  "quality": "showcase",
+  "specification": {
+    "path": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/candidate.json",
+    "sha256": "0c8c7a335bd1eb482c35046edbde14f259b6ae06721970cf7c4105da7b82a862",
+    "bytes": 12137
+  },
+  "artifact": {
+    "path": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/tradingagents-dataflow.html",
+    "sha256": "166d08d20a6b9e1689a33939f8d22a1705ddcaf2c65b1f22a3e81967d1c6454d",
+    "bytes": 861771
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/review-4/tradingagents-dataflow.finalize.json",
+    "summaryReceipt": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/review-4/tradingagents-dataflow.finalize-summary.json",
+    "browserCheckReceipt": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/review-4/tradingagents-dataflow.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-11-19T16:08:14.332Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 3772,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  },
+  "visualReviewRecommendation": {
+    "action": "inspect-route-readability",
+    "signals": {
+      "resolvedCrossovers": 1
+    },
+    "reason": "Automated gates passed, but crossings or detours still need perceptual review before claiming visual quality.",
+    "affectedRoutes": {
+      "crossings": [
+        {
+          "left": {
+            "id": "analysts-to-risk",
+            "from": "analysts",
+            "to": "risk",
+            "label": "四类报告",
+            "collectionIndex": 7,
+            "artifactIndex": 8
+          },
+          "right": {
+            "id": "research-to-pm",
+            "from": "research",
+            "to": "pm",
+            "label": "研究计划",
+            "collectionIndex": 8,
+            "artifactIndex": 9
+          },
+          "point": [
+            852.5,
+            271
+          ]
+        }
+      ],
+      "detours": [],
+      "truncated": false
+    },
+    "repair": "Advisory only: this mode places or routes these relationships itself. Report them; do not remove relationships or meaning to reduce crossings."
+  }
+}

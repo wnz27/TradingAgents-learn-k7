@@ -1,0 +1,586 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "TradingAgents 系统架构",
+    "locale": "zh-CN",
+    "output": ".archify/architecture-tradingagents-architecture-20261120-151545/tradingagents-architecture.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/wnz27/TradingAgents-learn-k7.git",
+      "revision": "9fa1196fffbcfd9de5146d2dd2869df84ab99838"
+    }
+  },
+  "components": [
+    {
+      "id": "entry",
+      "type": "frontend",
+      "label": "CLI 与 Python 入口",
+      "sublabel": "Typer／Rich · propagate()",
+      "sources": [
+        {
+          "path": "cli/main.py",
+          "line": 36,
+          "end_line": 104
+        },
+        {
+          "path": "cli/run.py",
+          "line": 219,
+          "end_line": 243
+        },
+        {
+          "path": "main.py",
+          "line": 9,
+          "end_line": 16
+        }
+      ],
+      "pos": [
+        40,
+        185
+      ],
+      "size": [
+        170,
+        62
+      ]
+    },
+    {
+      "id": "service",
+      "type": "backend",
+      "label": "运行编排",
+      "sublabel": "配置 · 标的 · 持仓 · 生命周期",
+      "sources": [
+        {
+          "path": "tradingagents/graph/trading_graph.py",
+          "line": 69,
+          "end_line": 113
+        },
+        {
+          "path": "tradingagents/graph/trading_graph.py",
+          "line": 293,
+          "end_line": 307
+        },
+        {
+          "path": "tradingagents/graph/trading_graph.py",
+          "line": 373,
+          "end_line": 405
+        }
+      ],
+      "pos": [
+        283,
+        185
+      ],
+      "size": [
+        170,
+        62
+      ]
+    },
+    {
+      "id": "graph",
+      "type": "backend",
+      "label": "LangGraph Agent 图",
+      "sublabel": "分析／研究／交易／风控／裁决",
+      "sources": [
+        {
+          "path": "tradingagents/graph/setup.py",
+          "line": 123,
+          "end_line": 185
+        },
+        {
+          "path": "tradingagents/graph/setup.py",
+          "line": 53,
+          "end_line": 90
+        },
+        {
+          "path": "tradingagents/graph/analyst_execution.py",
+          "line": 20,
+          "end_line": 45
+        }
+      ],
+      "pos": [
+        548,
+        185
+      ],
+      "size": [
+        170,
+        62
+      ]
+    },
+    {
+      "id": "llms",
+      "type": "backend",
+      "label": "模型接入层",
+      "sublabel": "quick／deep · 客户端与认证",
+      "sources": [
+        {
+          "path": "tradingagents/llm_clients/factory.py",
+          "line": 7,
+          "end_line": 56
+        },
+        {
+          "path": "tradingagents/llm_clients/factory.py",
+          "line": 137,
+          "end_line": 156
+        }
+      ],
+      "pos": [
+        803,
+        185
+      ],
+      "size": [
+        170,
+        62
+      ]
+    },
+    {
+      "id": "provider",
+      "type": "cloud",
+      "label": "模型端点",
+      "sublabel": "原生 API／兼容 API／本地模型",
+      "sources": [
+        {
+          "path": "tradingagents/llm_clients/factory.py",
+          "line": 31,
+          "end_line": 56
+        },
+        {
+          "path": "tradingagents/llm_clients/openai_client.py",
+          "line": 261,
+          "end_line": 302
+        }
+      ],
+      "pos": [
+        1050,
+        185
+      ],
+      "size": [
+        170,
+        62
+      ]
+    },
+    {
+      "id": "report",
+      "type": "database",
+      "label": "报告目录",
+      "sublabel": "分 Agent Markdown · 汇总 HTML",
+      "sources": [
+        {
+          "path": "cli/run.py",
+          "line": 426,
+          "end_line": 452
+        },
+        {
+          "path": "tradingagents/graph/trading_graph.py",
+          "line": 277,
+          "end_line": 291
+        },
+        {
+          "path": "tradingagents/reporting.py",
+          "line": 92,
+          "end_line": 136
+        }
+      ],
+      "pos": [
+        40,
+        40
+      ],
+      "size": [
+        170,
+        62
+      ]
+    },
+    {
+      "id": "checkpoint",
+      "type": "database",
+      "label": "SQLite 检查点",
+      "sublabel": "按标的分库 · 可选恢复",
+      "sources": [
+        {
+          "path": "tradingagents/graph/trading_graph.py",
+          "line": 192,
+          "end_line": 229
+        },
+        {
+          "path": "tradingagents/graph/checkpointer.py",
+          "line": 19,
+          "end_line": 65
+        },
+        {
+          "path": "tradingagents/graph/checkpointer.py",
+          "line": 85,
+          "end_line": 99
+        }
+      ],
+      "pos": [
+        283,
+        40
+      ],
+      "size": [
+        170,
+        62
+      ]
+    },
+    {
+      "id": "memory",
+      "type": "backend",
+      "label": "决策记忆与结算",
+      "sublabel": "收益／Alpha · quick 模型反思",
+      "sources": [
+        {
+          "path": "tradingagents/graph/trading_graph.py",
+          "line": 309,
+          "end_line": 371
+        },
+        {
+          "path": "tradingagents/memory/settlement.py",
+          "line": 136,
+          "end_line": 196
+        },
+        {
+          "path": "tradingagents/memory/settlement.py",
+          "line": 60,
+          "end_line": 125
+        }
+      ],
+      "pos": [
+        548,
+        40
+      ],
+      "size": [
+        170,
+        62
+      ]
+    },
+    {
+      "id": "memorylog",
+      "type": "database",
+      "label": "Markdown 决策账本",
+      "sublabel": "单次分析与回测各自存放",
+      "sources": [
+        {
+          "path": "tradingagents/memory/log.py",
+          "line": 32,
+          "end_line": 107
+        },
+        {
+          "path": "tradingagents/memory/log.py",
+          "line": 137,
+          "end_line": 205
+        },
+        {
+          "path": "tradingagents/backtest.py",
+          "line": 160,
+          "end_line": 174
+        }
+      ],
+      "pos": [
+        803,
+        40
+      ],
+      "size": [
+        170,
+        62
+      ]
+    },
+    {
+      "id": "backtest",
+      "type": "backend",
+      "label": "批量回测",
+      "sublabel": "标的 × 日期 · 断点续扫 · 按评级汇总",
+      "sources": [
+        {
+          "path": "cli/main.py",
+          "line": 107,
+          "end_line": 160
+        },
+        {
+          "path": "tradingagents/backtest.py",
+          "line": 143,
+          "end_line": 203
+        },
+        {
+          "path": "tradingagents/backtest.py",
+          "line": 206,
+          "end_line": 236
+        }
+      ],
+      "pos": [
+        40,
+        335
+      ],
+      "size": [
+        170,
+        62
+      ]
+    },
+    {
+      "id": "runlog",
+      "type": "database",
+      "label": "运行状态 JSON",
+      "sublabel": "标的／日期 · 报告、辩论与评级",
+      "sources": [
+        {
+          "path": "tradingagents/graph/trading_graph.py",
+          "line": 359,
+          "end_line": 371
+        },
+        {
+          "path": "tradingagents/graph/trading_graph.py",
+          "line": 438,
+          "end_line": 476
+        }
+      ],
+      "pos": [
+        283,
+        335
+      ],
+      "size": [
+        170,
+        62
+      ]
+    },
+    {
+      "id": "tools",
+      "type": "backend",
+      "label": "分析取数",
+      "sublabel": "ToolNode · 情绪预取 · 参数限界",
+      "sources": [
+        {
+          "path": "tradingagents/graph/setup.py",
+          "line": 76,
+          "end_line": 90
+        },
+        {
+          "path": "tradingagents/agents/tools.py",
+          "line": 18,
+          "end_line": 111
+        },
+        {
+          "path": "tradingagents/agents/analysts/sentiment_analyst.py",
+          "line": 1,
+          "end_line": 108
+        }
+      ],
+      "pos": [
+        548,
+        335
+      ],
+      "size": [
+        170,
+        62
+      ]
+    },
+    {
+      "id": "router",
+      "type": "backend",
+      "label": "数据路由与适配器",
+      "sublabel": "逐工具选源 · 时间裁剪 · 降级",
+      "sources": [
+        {
+          "path": "tradingagents/dataflows/router.py",
+          "line": 96,
+          "end_line": 149
+        },
+        {
+          "path": "tradingagents/dataflows/router.py",
+          "line": 200,
+          "end_line": 285
+        },
+        {
+          "path": "tradingagents/dataflows/vendors/yahoo/ohlcv.py",
+          "line": 161,
+          "end_line": 255
+        }
+      ],
+      "pos": [
+        803,
+        335
+      ],
+      "size": [
+        170,
+        62
+      ]
+    },
+    {
+      "id": "feeds",
+      "type": "cloud",
+      "label": "市场与资讯来源",
+      "sublabel": "行情、财报、新闻、社交、宏观、事件",
+      "sources": [
+        {
+          "path": "tradingagents/dataflows/router.py",
+          "line": 96,
+          "end_line": 149
+        },
+        {
+          "path": "tradingagents/agents/analysts/sentiment_analyst.py",
+          "line": 1,
+          "end_line": 108
+        }
+      ],
+      "pos": [
+        1050,
+        335
+      ],
+      "size": [
+        170,
+        62
+      ]
+    },
+    {
+      "id": "cache",
+      "type": "database",
+      "label": "本地供应商缓存",
+      "sublabel": "OHLCV CSV · 按来源复用",
+      "sources": [
+        {
+          "path": "tradingagents/dataflows/vendors/yahoo/ohlcv.py",
+          "line": 181,
+          "end_line": 225
+        },
+        {
+          "path": "tradingagents/dataflows/files.py",
+          "line": 1,
+          "end_line": 70
+        }
+      ],
+      "pos": [
+        803,
+        468
+      ],
+      "size": [
+        170,
+        62
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "entry-to-service",
+      "from": "entry",
+      "to": "service",
+      "label": "启动分析",
+      "variant": "emphasis"
+    },
+    {
+      "id": "service-to-graph",
+      "from": "service",
+      "to": "graph",
+      "label": "执行／流式事件",
+      "variant": "emphasis"
+    },
+    {
+      "id": "graph-to-llms",
+      "from": "graph",
+      "to": "llms",
+      "label": "提示与模型输出",
+      "variant": "emphasis"
+    },
+    {
+      "id": "llms-to-provider",
+      "from": "llms",
+      "to": "provider",
+      "label": "调用模型"
+    },
+    {
+      "id": "entry-to-report",
+      "from": "entry",
+      "to": "report",
+      "label": "选择保存"
+    },
+    {
+      "id": "service-to-checkpoint",
+      "from": "service",
+      "to": "checkpoint",
+      "label": "启用时读写"
+    },
+    {
+      "id": "graph-to-memory",
+      "from": "graph",
+      "to": "memory",
+      "label": "结算、读经验"
+    },
+    {
+      "id": "memory-to-memorylog",
+      "from": "memory",
+      "to": "memorylog",
+      "label": "决策、结算、反思"
+    },
+    {
+      "id": "entry-to-backtest",
+      "from": "entry",
+      "to": "backtest",
+      "label": "回测命令"
+    },
+    {
+      "id": "backtest-to-service",
+      "from": "backtest",
+      "to": "service",
+      "label": "逐格复用"
+    },
+    {
+      "id": "service-to-runlog",
+      "from": "service",
+      "to": "runlog",
+      "label": "完成后写入"
+    },
+    {
+      "id": "graph-to-tools",
+      "from": "graph",
+      "to": "tools",
+      "label": "分析阶段取数"
+    },
+    {
+      "id": "tools-to-router",
+      "from": "tools",
+      "to": "router",
+      "label": "适用工具走路由"
+    },
+    {
+      "id": "router-to-feeds",
+      "from": "router",
+      "to": "feeds",
+      "label": "调用配置来源"
+    },
+    {
+      "id": "router-to-cache",
+      "from": "router",
+      "to": "cache",
+      "label": "按来源读写"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Agent 和模型职责",
+      "items": [
+        "市场、情绪、新闻、基本面按所选分支并行，记忆结算也参加汇合。",
+        "多空辩论后由研究经理定研究计划，Trader 给提案，激进／保守／中性辩论后由组合经理产出最终评级。",
+        "两个经理用 deep，分析、辩论、Trader 与记忆反思用 quick。"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "哪些路径绕过通用路由",
+      "items": [
+        "情绪分析直接调用 Stocktwits／Reddit，可选 TypeSafe Jev 过滤帖子。标的身份、市场快照与记忆结算收盘价直接用 Yahoo 适配器。",
+        "通用路由接入 Yahoo、Alpha Vantage、SEC EDGAR、FRED、Polymarket。"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "运行边界",
+      "items": [
+        "本地 Python 进程可由 CLI、脚本或 Docker 启动。外部模型和数据由客户端调用。",
+        "组合输入来自调用者 JSON。持仓只进入决策提示与恢复签名，组合经理产出建议。"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "三种持久化用途",
+      "items": [
+        "SQLite 恢复未完成的图，成功后清理相应线程。",
+        "状态 JSON 为单次结果；报告目录按需生成。完成后的决策写入账本，后续补结算，回测汇总读取其独立账本。"
+      ]
+    }
+  ]
+}

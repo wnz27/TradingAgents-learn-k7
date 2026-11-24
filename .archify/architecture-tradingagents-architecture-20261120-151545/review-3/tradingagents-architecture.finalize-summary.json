@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "architecture",
+  "quality": "showcase",
+  "specification": {
+    "path": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/candidate.json",
+    "sha256": "e34f824ae39437d55e2d9645c8d839581587a2e1e808da4362eab146ca842f8a",
+    "bytes": 13045
+  },
+  "artifact": {
+    "path": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/tradingagents-architecture.html",
+    "sha256": "d63a61c63a0509828f7d2a41e35c61420cf6d77a92375f7a06d92a42732c93e4",
+    "bytes": 868988
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/review-3/tradingagents-architecture.finalize.json",
+    "summaryReceipt": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/review-3/tradingagents-architecture.finalize-summary.json",
+    "browserCheckReceipt": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/review-3/tradingagents-architecture.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-11-19T16:08:14.332Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 3845,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  }
+}

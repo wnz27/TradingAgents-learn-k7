@@ -1,0 +1,521 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "TradingAgents 决策数据流程",
+    "locale": "zh-CN",
+    "output": ".archify/dataflow-tradingagents-dataflow-20261120-151545/tradingagents-dataflow.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/wnz27/TradingAgents-learn-k7.git",
+      "revision": "9fa1196fffbcfd9de5146d2dd2869df84ab99838"
+    }
+  },
+  "stages": [
+    {
+      "label": "输入来源"
+    },
+    {
+      "label": "读取与校验"
+    },
+    {
+      "label": "分析与经验"
+    },
+    {
+      "label": "研究归纳"
+    },
+    {
+      "label": "决策与输出"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "request",
+      "type": "frontend",
+      "label": "分析请求",
+      "sublabel": "标的／日期／资产／持仓",
+      "sources": [
+        {
+          "path": "cli/main.py",
+          "line": 36,
+          "end_line": 93
+        },
+        {
+          "path": "tradingagents/portfolio.py",
+          "line": 25,
+          "end_line": 45
+        },
+        {
+          "path": "tradingagents/backtest.py",
+          "line": 172,
+          "end_line": 185
+        }
+      ],
+      "stage": 0,
+      "row": 0
+    },
+    {
+      "id": "init",
+      "type": "backend",
+      "label": "初始状态",
+      "sublabel": "标的身份、截止日与组合",
+      "sources": [
+        {
+          "path": "tradingagents/graph/trading_graph.py",
+          "line": 293,
+          "end_line": 307
+        },
+        {
+          "path": "tradingagents/graph/propagation.py",
+          "line": 13,
+          "end_line": 65
+        },
+        {
+          "path": "tradingagents/graph/trading_graph.py",
+          "line": 117,
+          "end_line": 128
+        }
+      ],
+      "stage": 1,
+      "row": 0
+    },
+    {
+      "id": "sources",
+      "type": "cloud",
+      "label": "数据来源",
+      "sublabel": "行情／公告／新闻／社交",
+      "sources": [
+        {
+          "path": "tradingagents/dataflows/router.py",
+          "line": 96,
+          "end_line": 149
+        },
+        {
+          "path": "tradingagents/agents/analysts/sentiment_analyst.py",
+          "line": 1,
+          "end_line": 108
+        }
+      ],
+      "stage": 0,
+      "row": 1
+    },
+    {
+      "id": "material",
+      "type": "backend",
+      "label": "取数与限界",
+      "sublabel": "截止日裁剪 · 缺失标记",
+      "sources": [
+        {
+          "path": "tradingagents/agents/tools.py",
+          "line": 18,
+          "end_line": 130
+        },
+        {
+          "path": "tradingagents/agents/tools.py",
+          "line": 152,
+          "end_line": 229
+        },
+        {
+          "path": "tradingagents/dataflows/router.py",
+          "line": 231,
+          "end_line": 285
+        }
+      ],
+      "stage": 1,
+      "row": 1
+    },
+    {
+      "id": "analysts",
+      "type": "backend",
+      "label": "并行分析",
+      "sublabel": "市场／情绪／新闻／基本面",
+      "sources": [
+        {
+          "path": "tradingagents/graph/analyst_execution.py",
+          "line": 20,
+          "end_line": 45
+        },
+        {
+          "path": "tradingagents/graph/setup.py",
+          "line": 53,
+          "end_line": 90
+        },
+        {
+          "path": "tradingagents/graph/setup.py",
+          "line": 144,
+          "end_line": 166
+        }
+      ],
+      "stage": 2,
+      "row": 0
+    },
+    {
+      "id": "research",
+      "type": "backend",
+      "label": "多空与研究经理",
+      "sublabel": "证据辩论 → 投资计划",
+      "sources": [
+        {
+          "path": "tradingagents/graph/setup.py",
+          "line": 148,
+          "end_line": 175
+        },
+        {
+          "path": "tradingagents/agents/managers/research_manager.py",
+          "line": 14,
+          "end_line": 70
+        }
+      ],
+      "stage": 3,
+      "row": 0
+    },
+    {
+      "id": "trader",
+      "type": "backend",
+      "label": "Trader",
+      "sublabel": "方向／入场／止损／仓位",
+      "sources": [
+        {
+          "path": "tradingagents/agents/trader/trader.py",
+          "line": 20,
+          "end_line": 44
+        },
+        {
+          "path": "tradingagents/agents/trader/trader.py",
+          "line": 65,
+          "end_line": 96
+        }
+      ],
+      "stage": 4,
+      "row": 0
+    },
+    {
+      "id": "risk",
+      "type": "backend",
+      "label": "三方风控",
+      "sublabel": "激进／保守／中性",
+      "sources": [
+        {
+          "path": "tradingagents/graph/setup.py",
+          "line": 175,
+          "end_line": 185
+        },
+        {
+          "path": "tradingagents/agents/risk_mgmt/aggressive_debator.py",
+          "line": 12,
+          "end_line": 50
+        }
+      ],
+      "stage": 4,
+      "row": 1
+    },
+    {
+      "id": "pm",
+      "type": "backend",
+      "label": "组合经理",
+      "sublabel": "五档评级或 REVIEW",
+      "sources": [
+        {
+          "path": "tradingagents/agents/managers/portfolio_manager.py",
+          "line": 23,
+          "end_line": 63
+        },
+        {
+          "path": "tradingagents/agents/managers/portfolio_manager.py",
+          "line": 78,
+          "end_line": 104
+        }
+      ],
+      "stage": 4,
+      "row": 2
+    },
+    {
+      "id": "outputs",
+      "type": "database",
+      "label": "状态与报告",
+      "sublabel": "JSON／Markdown／HTML",
+      "sources": [
+        {
+          "path": "tradingagents/graph/trading_graph.py",
+          "line": 359,
+          "end_line": 371
+        },
+        {
+          "path": "tradingagents/graph/trading_graph.py",
+          "line": 438,
+          "end_line": 476
+        },
+        {
+          "path": "tradingagents/reporting.py",
+          "line": 92,
+          "end_line": 136
+        }
+      ],
+      "stage": 4,
+      "row": 3
+    },
+    {
+      "id": "closes",
+      "type": "cloud",
+      "label": "Yahoo 收盘价",
+      "sublabel": "标的与地区基准",
+      "sources": [
+        {
+          "path": "tradingagents/memory/settlement.py",
+          "line": 16,
+          "end_line": 37
+        },
+        {
+          "path": "tradingagents/memory/settlement.py",
+          "line": 90,
+          "end_line": 125
+        },
+        {
+          "path": "tradingagents/dataflows/vendors/yahoo/market.py",
+          "line": 266,
+          "end_line": 275
+        }
+      ],
+      "stage": 0,
+      "row": 2
+    },
+    {
+      "id": "settle",
+      "type": "backend",
+      "label": "结算与反思",
+      "sublabel": "收益率与 Alpha",
+      "sources": [
+        {
+          "path": "tradingagents/memory/settlement.py",
+          "line": 77,
+          "end_line": 125
+        },
+        {
+          "path": "tradingagents/memory/settlement.py",
+          "line": 146,
+          "end_line": 182
+        },
+        {
+          "path": "tradingagents/memory/reflection.py",
+          "line": 36,
+          "end_line": 63
+        }
+      ],
+      "stage": 1,
+      "row": 2
+    },
+    {
+      "id": "lessons",
+      "type": "backend",
+      "label": "历史经验筛选",
+      "sublabel": "按分析日期过滤",
+      "sources": [
+        {
+          "path": "tradingagents/graph/trading_graph.py",
+          "line": 309,
+          "end_line": 336
+        },
+        {
+          "path": "tradingagents/memory/log.py",
+          "line": 93,
+          "end_line": 133
+        }
+      ],
+      "stage": 2,
+      "row": 2
+    },
+    {
+      "id": "ledger",
+      "type": "database",
+      "label": "决策账本",
+      "sublabel": "待结算／已结算 Markdown",
+      "sources": [
+        {
+          "path": "tradingagents/memory/log.py",
+          "line": 32,
+          "end_line": 60
+        },
+        {
+          "path": "tradingagents/memory/log.py",
+          "line": 137,
+          "end_line": 205
+        },
+        {
+          "path": "tradingagents/backtest.py",
+          "line": 160,
+          "end_line": 174
+        }
+      ],
+      "stage": 2,
+      "row": 3
+    },
+    {
+      "id": "summary",
+      "type": "backend",
+      "label": "回测汇总",
+      "sublabel": "命中率／平均 Alpha",
+      "sources": [
+        {
+          "path": "tradingagents/backtest.py",
+          "line": 191,
+          "end_line": 203
+        },
+        {
+          "path": "tradingagents/backtest.py",
+          "line": 206,
+          "end_line": 236
+        }
+      ],
+      "stage": 2,
+      "row": 4
+    }
+  ],
+  "flows": [
+    {
+      "id": "request-to-init",
+      "from": "request",
+      "to": "init",
+      "label": "参数与持仓",
+      "variant": "emphasis"
+    },
+    {
+      "id": "init-to-analysts",
+      "from": "init",
+      "to": "analysts",
+      "label": "标的与日期",
+      "variant": "emphasis"
+    },
+    {
+      "id": "sources-to-material",
+      "from": "sources",
+      "to": "material",
+      "label": "供应商记录"
+    },
+    {
+      "id": "material-to-analysts",
+      "from": "material",
+      "to": "analysts",
+      "label": "工具结果"
+    },
+    {
+      "id": "analysts-to-research",
+      "from": "analysts",
+      "to": "research",
+      "label": "分析报告",
+      "variant": "emphasis"
+    },
+    {
+      "id": "research-to-trader",
+      "from": "research",
+      "to": "trader",
+      "label": "投资计划",
+      "variant": "emphasis"
+    },
+    {
+      "id": "trader-to-risk",
+      "from": "trader",
+      "to": "risk",
+      "label": "交易提案",
+      "variant": "emphasis"
+    },
+    {
+      "id": "analysts-to-risk",
+      "from": "analysts",
+      "to": "risk",
+      "label": "四类报告"
+    },
+    {
+      "id": "research-to-pm",
+      "from": "research",
+      "to": "pm",
+      "label": "研究计划"
+    },
+    {
+      "id": "risk-to-pm",
+      "from": "risk",
+      "to": "pm",
+      "label": "风控辩论",
+      "variant": "emphasis"
+    },
+    {
+      "id": "pm-to-outputs",
+      "from": "pm",
+      "to": "outputs",
+      "label": "状态与评级",
+      "variant": "emphasis"
+    },
+    {
+      "id": "closes-to-settle",
+      "from": "closes",
+      "to": "settle",
+      "label": "有效收盘"
+    },
+    {
+      "id": "ledger-to-settle",
+      "from": "ledger",
+      "to": "settle",
+      "label": "待结算决策",
+      "route": "vertical-channel",
+      "channelX": 440
+    },
+    {
+      "id": "settle-to-ledger",
+      "from": "settle",
+      "to": "ledger",
+      "label": "收益与反思",
+      "route": "vertical-channel",
+      "channelX": 405
+    },
+    {
+      "id": "ledger-to-lessons",
+      "from": "ledger",
+      "to": "lessons",
+      "label": "历史结算"
+    },
+    {
+      "id": "lessons-to-pm",
+      "from": "lessons",
+      "to": "pm",
+      "label": "可见经验"
+    },
+    {
+      "id": "pm-to-ledger",
+      "from": "pm",
+      "to": "ledger",
+      "label": "决策与评级"
+    },
+    {
+      "id": "ledger-to-summary",
+      "from": "ledger",
+      "to": "summary",
+      "label": "回测账本"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "共享 AgentState",
+      "items": [
+        "初始标的语境在全图可见，Trader／风控／组合经理另用持仓语境。",
+        "Trader 还直接读取市场报告，风控读各分析报告，组合经理直接读投资计划与提案。",
+        "各 analyst 子图保有私有工具消息，汇合返回各自报告字段。"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "日期约束",
+      "items": [
+        "分析工具锁定到分析日，历史财报按披露日期过滤，无披露日则不给历史数值。",
+        "结算使用分析日之后首个有效收盘作为基准点，等完整持有窗口届满；历史经验只读截止日前已知的结算结果。"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "落盘与返回",
+      "items": [
+        "组合经理写 final_trade_decision 和 final_rating。运行层落盘状态及待结算决策，Python 返回状态和评级，CLI 或 API 按需另存报告。",
+        "回测逐格复用同一决策过程，结算后仅用独立账本的结果统计。"
+      ]
+    }
+  ]
+}

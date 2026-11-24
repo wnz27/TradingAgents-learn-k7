@@ -1,0 +1,373 @@
+{
+  "schemaVersion": 1,
+  "ok": false,
+  "command": "finalize",
+  "status": "fail",
+  "type": "dataflow",
+  "quality": "showcase",
+  "startedAt": "2026-11-20T07:17:45.067Z",
+  "specification": {
+    "path": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/candidate.json",
+    "sha256": "77ed10b7e029bed20c7563a3bece0b754d798173e97478474662a9b8e6ac0b24",
+    "bytes": 11774
+  },
+  "artifact": {
+    "path": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/tradingagents-dataflow.html",
+    "sha256": "22177c5069b3d88b49c41b52688d0d65ebec60298c367b6da77113c2a95a0a14",
+    "bytes": 859650
+  },
+  "stages": {
+    "validate": {
+      "status": "pass",
+      "exitCode": 0,
+      "durationMs": null,
+      "execution": "embedded-in-deliver",
+      "command": [
+        "/Users/f27/.nvm/versions/node/v20.20.2/bin/node",
+        "/Users/f27/.agents/skills/archify/bin/archify.mjs",
+        "deliver",
+        "dataflow",
+        "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/candidate.json",
+        "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/tradingagents-dataflow.html",
+        "--quality",
+        "showcase",
+        "--repo-root",
+        "/Users/f27/learn/fin_ai/TradingAgents-learn-k7",
+        "--json"
+      ],
+      "receipt": {
+        "schemaVersion": 1,
+        "ok": true,
+        "command": "validate",
+        "specification": {
+          "sha256": "77ed10b7e029bed20c7563a3bece0b754d798173e97478474662a9b8e6ac0b24",
+          "bytes": 11774
+        },
+        "validation": {
+          "checksPassed": 9,
+          "checkCount": 9,
+          "compositionProfile": "showcase",
+          "compositionStatus": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    "deliver": {
+      "status": "pass",
+      "exitCode": 0,
+      "durationMs": 1296,
+      "command": [
+        "/Users/f27/.nvm/versions/node/v20.20.2/bin/node",
+        "/Users/f27/.agents/skills/archify/bin/archify.mjs",
+        "deliver",
+        "dataflow",
+        "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/candidate.json",
+        "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/tradingagents-dataflow.html",
+        "--quality",
+        "showcase",
+        "--repo-root",
+        "/Users/f27/learn/fin_ai/TradingAgents-learn-k7",
+        "--json"
+      ],
+      "receipt": {
+        "schemaVersion": 1,
+        "receiptId": "a6521896-d651-48bf-847e-bc8beab3e3df",
+        "ok": true,
+        "command": "deliver",
+        "type": "dataflow",
+        "input": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/candidate.json",
+        "output": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/tradingagents-dataflow.html",
+        "specification": {
+          "sha256": "77ed10b7e029bed20c7563a3bece0b754d798173e97478474662a9b8e6ac0b24",
+          "bytes": 11774
+        },
+        "artifact": {
+          "sha256": "22177c5069b3d88b49c41b52688d0d65ebec60298c367b6da77113c2a95a0a14",
+          "bytes": 859650
+        },
+        "validation": {
+          "checksPassed": 9,
+          "checkCount": 9,
+          "compositionProfile": "showcase",
+          "compositionStatus": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "evidence": {
+          "verified": true,
+          "repository": "https://github.com/wnz27/TradingAgents-learn-k7",
+          "revision": "9fa1196fffbcfd9de5146d2dd2869df84ab99838",
+          "references": 38
+        },
+        "update": {
+          "status": "unavailable",
+          "installedVersion": null,
+          "availableVersion": null,
+          "releaseNotes": null,
+          "checkedAt": null,
+          "source": null,
+          "noticeRequired": false,
+          "noticeText": null,
+          "reason": "disabled"
+        }
+      }
+    },
+    "check": {
+      "status": "pass",
+      "exitCode": 0,
+      "durationMs": 167,
+      "command": [
+        "/Users/f27/.nvm/versions/node/v20.20.2/bin/node",
+        "/Users/f27/.agents/skills/archify/bin/archify.mjs",
+        "check",
+        "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/tradingagents-dataflow.html",
+        "--require-provenance"
+      ],
+      "receipt": {
+        "ok": true,
+        "file": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/tradingagents-dataflow.html",
+        "artifact": {
+          "sha256": "22177c5069b3d88b49c41b52688d0d65ebec60298c367b6da77113c2a95a0a14",
+          "bytes": 859650
+        },
+        "checks": [
+          {
+            "name": "single_svg",
+            "ok": true,
+            "details": [
+              "found 1 <svg> block(s)"
+            ]
+          },
+          {
+            "name": "finite_svg",
+            "ok": true,
+            "details": []
+          },
+          {
+            "name": "orthogonal_arrows",
+            "ok": true,
+            "details": []
+          },
+          {
+            "name": "label_route_clearance",
+            "ok": true,
+            "details": []
+          },
+          {
+            "name": "relationship_crossings",
+            "ok": true,
+            "details": []
+          },
+          {
+            "name": "relationship_corridors",
+            "ok": true,
+            "details": []
+          },
+          {
+            "name": "container_border_runs",
+            "ok": true,
+            "details": []
+          },
+          {
+            "name": "route_rhythm",
+            "ok": true,
+            "details": []
+          },
+          {
+            "name": "legend_clearance",
+            "ok": true,
+            "details": []
+          }
+        ],
+        "composition": {
+          "schemaVersion": 1,
+          "profile": "showcase",
+          "status": "pass",
+          "summary": {
+            "errors": 0,
+            "warnings": 0
+          },
+          "metrics": {
+            "properCrossings": 0,
+            "resolvedCrossovers": 0,
+            "ambiguousCorridors": 0,
+            "arrowheadCollisions": 0,
+            "containerBorderRuns": 0,
+            "labelRouteClearanceIssues": 0,
+            "labelCanvasOverflowIssues": 0,
+            "minLabelRouteClearance": 6,
+            "desktopReadabilityIssues": 0,
+            "viewportHeightIssues": 0,
+            "minProjectedNodeTextPx": 6.095505617977528,
+            "maxBends": 2,
+            "routesOverSuggestedBends": 0,
+            "maxStretch": 1,
+            "routesOverSuggestedStretch": 0,
+            "minSegmentPx": 51.5,
+            "minInteriorSegmentPx": 105,
+            "shortSegmentCount": 0,
+            "shortEndpointSegmentCount": 0,
+            "shortInteriorSegmentCount": 0,
+            "microSegmentCount": 0
+          },
+          "suggestedLimits": {
+            "bendsPerRelationship": 2,
+            "stretch": 1.35,
+            "segmentPx": 16,
+            "microSegmentPx": 8
+          },
+          "routeReview": {
+            "crossings": [],
+            "detours": []
+          },
+          "leadingSpace": {
+            "measured": false,
+            "reviewSuggested": false
+          },
+          "desktopReadability": {
+            "budgetBasis": "legacy-930",
+            "readerContract": "declared-wide-v1",
+            "availableDiagramWidth": 930,
+            "actualBudgetPx": 930,
+            "limit": "legacy",
+            "requestedTargetPx": null,
+            "requestedTargetMet": null,
+            "hardFloorPx": 6,
+            "hardFloorMet": true,
+            "minimumOwner": {
+              "kind": "node",
+              "id": "request"
+            },
+            "minimumSourceTextPx": 7,
+            "minimumProjectedTextPx": 6.095505617977528,
+            "semanticTextCount": 46
+          },
+          "issues": []
+        },
+        "provenance": "current",
+        "deliveryReceiptId": "a6521896-d651-48bf-847e-bc8beab3e3df"
+      }
+    },
+    "browser-check": {
+      "status": "fail",
+      "exitCode": 1,
+      "durationMs": 5363,
+      "command": [
+        "/Users/f27/.nvm/versions/node/v20.20.2/bin/node",
+        "/Users/f27/.agents/skills/archify/bin/archify.mjs",
+        "browser-check",
+        "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/tradingagents-dataflow.html",
+        "--json",
+        "--require-provenance"
+      ],
+      "execution": "in-process",
+      "receipt": {
+        "schemaVersion": 1,
+        "ok": false,
+        "command": "browser-check",
+        "evidenceKind": "automated-browser",
+        "status": "fail",
+        "visualReview": "not-requested",
+        "provenance": "current",
+        "deliveryReceiptId": "a6521896-d651-48bf-847e-bc8beab3e3df",
+        "artifact": {
+          "path": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/tradingagents-dataflow.html",
+          "sha256": "22177c5069b3d88b49c41b52688d0d65ebec60298c367b6da77113c2a95a0a14",
+          "bytes": 859650
+        },
+        "state": {
+          "detail": "read",
+          "motion": "still"
+        },
+        "chrome": {
+          "status": "available",
+          "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        },
+        "diagnostics": [
+          {
+            "code": "viewer/browser-check-runtime",
+            "severity": "error",
+            "message": "browser-check could not complete its Chrome inspection.",
+            "subject": {
+              "artifact": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/tradingagents-dataflow.html"
+            },
+            "evidence": {
+              "reason": "Chrome DevTools read pipe failed: stream ended\nChrome process: still running.\nChrome transport: Node v20.20.2, libuv 1.46.0, darwin; pid=67143, exitCode=null, signalCode=null.\nChrome read pipe: readable=false, ended=true, destroyed=false, receivedBytes=0, messages=0, bufferedBytes=0.\nChrome write pipe: writable=true, ended=false, destroyed=false, completedWrites=1, writtenBytes=50, bufferedBytes=0."
+            },
+            "supportedFixes": [
+              "resolve the reported Chrome inspection error, then rerun browser-check"
+            ]
+          }
+        ],
+        "containment": {
+          "status": "fail",
+          "policy": "fit-or-reader-declared-readable-vertical-scroll",
+          "viewports": []
+        },
+        "themeStates": {
+          "status": "fail",
+          "viewports": []
+        },
+        "readability": {
+          "status": "fail",
+          "minimumProjectedNodeTextPx": 6,
+          "viewports": []
+        },
+        "viewerChrome": {
+          "status": "fail",
+          "viewports": []
+        },
+        "captures": {
+          "status": "not-requested",
+          "screenshots": [],
+          "contactSheet": null
+        },
+        "sidecars": {
+          "receipt": "tradingagents-dataflow.browser-check.json",
+          "files": []
+        },
+        "error": "Chrome DevTools read pipe failed: stream ended\nChrome process: still running.\nChrome transport: Node v20.20.2, libuv 1.46.0, darwin; pid=67143, exitCode=null, signalCode=null.\nChrome read pipe: readable=false, ended=true, destroyed=false, receivedBytes=0, messages=0, bufferedBytes=0.\nChrome write pipe: writable=true, ended=false, destroyed=false, completedWrites=1, writtenBytes=50, bufferedBytes=0."
+      }
+    }
+  },
+  "browserCheck": {
+    "requested": true,
+    "ran": false
+  },
+  "diagnostics": [
+    {
+      "code": "viewer/browser-check-runtime",
+      "severity": "error",
+      "message": "browser-check could not complete its Chrome inspection.",
+      "subject": {
+        "artifact": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/tradingagents-dataflow.html"
+      },
+      "evidence": {
+        "reason": "Chrome DevTools read pipe failed: stream ended\nChrome process: still running.\nChrome transport: Node v20.20.2, libuv 1.46.0, darwin; pid=67143, exitCode=null, signalCode=null.\nChrome read pipe: readable=false, ended=true, destroyed=false, receivedBytes=0, messages=0, bufferedBytes=0.\nChrome write pipe: writable=true, ended=false, destroyed=false, completedWrites=1, writtenBytes=50, bufferedBytes=0."
+      },
+      "supportedFixes": [
+        "resolve the reported Chrome inspection error, then rerun browser-check"
+      ]
+    }
+  ],
+  "evidence": {
+    "receipt": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/tradingagents-dataflow.finalize.json",
+    "summaryReceipt": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/tradingagents-dataflow.finalize-summary.json",
+    "browserCheckReceipt": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/tradingagents-dataflow.browser-check.json"
+  },
+  "visualReview": "not-requested",
+  "failedStage": "browser-check",
+  "finishedAt": "2026-11-20T07:17:52.148Z",
+  "durationMs": 7080,
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-11-19T16:08:14.332Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  }
+}

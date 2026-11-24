@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "0700d3e6-dc94-43e3-bcb9-92180807f5c3",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/candidate.json",
+  "output": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-tradingagents-architecture-20261120-151545/tradingagents-architecture.html",
+  "specification": {
+    "sha256": "e34f824ae39437d55e2d9645c8d839581587a2e1e808da4362eab146ca842f8a",
+    "bytes": 13045
+  },
+  "artifact": {
+    "sha256": "d63a61c63a0509828f7d2a41e35c61420cf6d77a92375f7a06d92a42732c93e4",
+    "bytes": 868988
+  }
+}

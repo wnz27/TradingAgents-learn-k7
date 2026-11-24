@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "dcefb179-1c67-460a-bcb9-dd608be65e2a",
+  "status": "current",
+  "command": "deliver",
+  "type": "dataflow",
+  "input": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/candidate.json",
+  "output": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/dataflow-tradingagents-dataflow-20261120-151545/tradingagents-dataflow.html",
+  "specification": {
+    "sha256": "0c8c7a335bd1eb482c35046edbde14f259b6ae06721970cf7c4105da7b82a862",
+    "bytes": 12137
+  },
+  "artifact": {
+    "sha256": "166d08d20a6b9e1689a33939f8d22a1705ddcaf2c65b1f22a3e81967d1c6454d",
+    "bytes": 861771
+  }
+}
