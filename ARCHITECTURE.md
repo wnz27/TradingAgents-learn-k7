@@ -60,7 +60,7 @@ TradingAgents 是可从命令行运行、也可被 Python 程序调用的单标�
 
 Dockerfile 以 Python 3.13 slim 两阶段构建，运行进程为非 root 的 CLI。Compose 用 `.env` 注入配置，默认把 `~/.tradingagents` 挂到命名卷，也可用 `TRADINGAGENTS_DATA_DIR` 指定卷或绑定目录。`ollama` profile 另启动模型服务和定向到容器网络端点的 CLI 服务。`.dockerignore` 排除 `.env*`，Bedrock extra 和宿主机企业凭证均未写入默认容器配置。 [Docker 构建](Dockerfile) · [Compose 服务](docker-compose.yml) · [构建上下文排除](.dockerignore)
 
-CI 运行 Python 3.11–3.14 的 pytest 矩阵，另有一组 America/New_York 时区、无 dev extra 的安装导入检查和全库 Ruff。默认测试排除 `integration`，常规用例由共享 fixture 禁止 socket 和 curl_cffi 外连并隔离本地文件路径。发布 workflow 从 tag checkout，校验 tag 与版本常量一致，构建 sdist/wheel，在独立目录安装 wheel 验证 CLI 及资产，然后附到 GitHub Release。 [测试与 Ruff 配置](pyproject.toml#L58-L89) · [测试隔离](tests/conftest.py#L9-L76) · [CI](.github/workflows/ci.yml) · [发布流程](.github/workflows/release-assets.yml)
+Python 版通过 pytest 验证，默认排除 `integration`。常规用例由共享 fixture 禁止 socket 和 curl_cffi 外连并隔离本地文件路径。GitHub 的构建与发布流程用于 TypeScript 版。 [测试与 Ruff 配置](pyproject.toml#L58-L89) · [测试隔离](tests/conftest.py#L9-L76) · [TypeScript 构建](.github/workflows/build.yml) · [TypeScript 发布](.github/workflows/release.yml)
 
 | 要开发什么 | 先改哪里 | 回归入口 |
 | --- | --- | --- |
@@ -270,6 +270,6 @@ Research Manager、Trader、Portfolio Manager、Sentiment Analyst 首选模型�
 
 ## 10. 验证入口与阅读范围
 
-- 安装时使用 `python -m pip install -e '.[dev]'`。运行 `python -m pytest -q` 和 `ruff check .` 与仓库 CI 对齐。定位单一改动时可以先运行第 9 节对应测试，再跑整套。测试中使用 stub 模型和供应商替身验证图、路由和错误语义。 [项目依赖与 pytest 配置](pyproject.toml) · [CI](.github/workflows/ci.yml) · [端到端测试](tests/test_graph_end_to_end.py)
-- 用 [层次约束测试](tests/test_layering.py) 确认 yfinance 依赖留在 dataflows，用 [测试隔离](tests/test_suite_isolation.py) 和 [公共 fixture](tests/conftest.py) 确认环境变量、全局配置及网络替身可在用例间恢复。新增时间相关行为时同时覆盖历史日期和不同时区，因为 CI 包含非 UTC 运行。
+- 安装时使用 `python -m pip install -e '.[dev]'`。运行 `python -m pytest -q` 和 `ruff check .` 验证 Python 版。定位单一改动时可以先运行第 9 节对应测试，再跑整套。测试中使用 stub 模型和供应商替身验证图、路由和错误语义。 [项目依赖与 pytest 配置](pyproject.toml) · [端到端测试](tests/test_graph_end_to_end.py)
+- 用 [层次约束测试](tests/test_layering.py) 确认 yfinance 依赖留在 dataflows，用 [测试隔离](tests/test_suite_isolation.py) 和 [公共 fixture](tests/conftest.py) 确认环境变量、全局配置及网络替身可在用例间恢复。新增时间相关行为时同时覆盖历史日期和不同时区。
 - 本文基于源码、配置和仓库中的测试契约。两张图用于解释实现与数据依赖，外部供应商和模型的可用性、分析质量及收益表现取决于实际运行。
