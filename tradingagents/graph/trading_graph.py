@@ -10,16 +10,22 @@ from typing import Any
 import tradingagents
 from tradingagents.agents.context import build_instrument_context, resolve_instrument_identity
 from tradingagents.agents.rating import run_rating
-from tradingagents.dataflows.config import run_config, run_config_context, set_config
+from tradingagents.dataflows.config import get_config, run_config, run_config_context, set_config
 from tradingagents.dataflows.date_window import get_current_date, is_historical
 from tradingagents.dataflows.symbols import safe_ticker_component
+from tradingagents.dataflows.vendors.qianliyan import (
+    BOUNDARY_KEY,
+    NewsBoundary,
+    live_news_boundary,
+    read_daily_sentiment_context,
+)
 from tradingagents.default_config import DEFAULT_CONFIG
 from tradingagents.llm_clients import create_tier_client, tier_provider
 from tradingagents.memory import TradingMemoryLog, settlement
 from tradingagents.memory.reflection import Reflector
 from tradingagents.reporting import write_report_tree
 
-from .checkpointer import checkpoint_step, clear_checkpoint, get_checkpointer, thread_id
+from .checkpointer import clear_checkpoint, get_checkpointer, thread_id
 from .conditional_logic import ConditionalLogic
 from .propagation import Propagator
 from .setup import GraphSetup
@@ -112,6 +118,7 @@ class TradingAgentsGraph:
         self.workflow = self.graph_setup.setup_graph(selected_analysts, memory_node=self._memory_step)
         self.graph = self.workflow.compile()
         self._checkpointer_ctx = None
+        self._checkpoint_news_boundary: NewsBoundary | None = None
         self._resuming = False
 
     def resolve_instrument_context(self, ticker: str, asset_type: str = "stock",
@@ -137,7 +144,9 @@ class TradingAgentsGraph:
         """
         return str(trade_date) if is_historical(trade_date) else None
 
-    def _run_signature(self, asset_type: str, portfolio=None) -> str:
+    def _run_signature(
+        self, asset_type: str, portfolio=None, *, news_boundary: NewsBoundary | None = None,
+    ) -> str:
         """Run inputs that must invalidate a checkpoint if changed.
 
         Keyed into the checkpoint thread ID so a resume under a different analyst
@@ -148,6 +157,8 @@ class TradingAgentsGraph:
         the run keeps its files and how it retries are left out.
         """
         settings = {k: v for k, v in self.config.items() if k not in _NOT_IN_SIGNATURE}
+        if news_boundary is not None:
+            settings[BOUNDARY_KEY] = _news_boundary_state(news_boundary) or "unavailable"
         digest = hashlib.sha256(json.dumps(settings, sort_keys=True, default=str).encode()).hexdigest()[:12]
         return "|".join([
             "analysts=" + ",".join(self.selected_analysts),
@@ -164,7 +175,10 @@ class TradingAgentsGraph:
             f"settings={digest}",
         ])
 
-    def propagate(self, company_name, trade_date, asset_type: str = "stock", portfolio=None):
+    def propagate(
+        self, company_name, trade_date, asset_type: str = "stock", portfolio=None,
+        *, news_boundary: NewsBoundary | None = None,
+    ):
         """Run the trading agents graph for a company on a specific date.
 
         ``asset_type`` selects between the stock pipeline (default) and the
@@ -182,14 +196,21 @@ class TradingAgentsGraph:
         """
         trade_date = _validate_trade_date(trade_date)
 
-        with run_config(self.config), \
-                self.checkpoint_scope(company_name, trade_date, asset_type, portfolio) as thread_id_value:
+        with (
+            run_config(self._analysis_config(news_boundary)),
+            self.checkpoint_scope(
+                company_name, trade_date, asset_type, portfolio, news_boundary=news_boundary
+            ) as thread_id_value,
+        ):
             return self._run_graph(
                 company_name, trade_date, asset_type=asset_type,
                 checkpoint_thread_id=thread_id_value, portfolio=portfolio,
             )
 
-    def begin_checkpoint(self, company_name, trade_date, asset_type: str = "stock", portfolio=None) -> str | None:
+    def begin_checkpoint(
+        self, company_name, trade_date, asset_type: str = "stock", portfolio=None,
+        *, news_boundary: NewsBoundary | None = None,
+    ) -> str | None:
         """Recompile the graph with a per-ticker checkpointer and return the
         ``thread_id`` to inject into the stream/invoke ``config`` (or ``None``
         when checkpointing is disabled).
@@ -201,22 +222,31 @@ class TradingAgentsGraph:
         graph, making the flag a no-op.
         """
         self._resuming = False
+        self._checkpoint_news_boundary = None
         if not self.config.get("checkpoint_enabled"):
             return None
-        signature = self._run_signature(asset_type, portfolio)
+        # An explicit replay cutoff is part of the run identity. A live cutoff
+        # is chosen on first start and restored from that thread on retries.
+        signature = self._run_signature(asset_type, portfolio, news_boundary=news_boundary)
+        tid = thread_id(company_name, str(trade_date), signature)
         self._checkpointer_ctx = get_checkpointer(self.config["data_cache_dir"], company_name)
         saver = self._checkpointer_ctx.__enter__()
         self.graph = self.workflow.compile(checkpointer=saver)
 
-        step = checkpoint_step(
-            self.config["data_cache_dir"], company_name, str(trade_date), signature
-        )
+        saved = saver.get_tuple({"configurable": {"thread_id": tid}})
+        step = saved.metadata.get("step") if saved is not None else None
         self._resuming = step is not None
         if step is not None:
+            channels = saved.checkpoint["channel_values"]
+            self._checkpoint_news_boundary = (
+                _news_boundary_from_state(channels) or _news_boundary_from_state(channels.get("__start__"))
+            )
+            if news_boundary is not None and self._checkpoint_news_boundary != news_boundary:
+                raise ValueError("Checkpoint archive boundary differs from the requested replay")
             logger.info("Resuming from step %d for %s on %s", step, company_name, trade_date)
         else:
             logger.info("Starting fresh for %s on %s", company_name, trade_date)
-        return thread_id(company_name, str(trade_date), signature)
+        return tid
 
     def checkpoint_input(self, init_state):
         """The value to stream/invoke: ``None`` to resume an existing checkpoint,
@@ -234,22 +264,31 @@ class TradingAgentsGraph:
             self._checkpointer_ctx.__exit__(None, None, None)
             self._checkpointer_ctx = None
             self.graph = self.workflow.compile()
+        self._checkpoint_news_boundary = None
         self._resuming = False
 
     @contextmanager
-    def checkpoint_scope(self, company_name, trade_date, asset_type: str = "stock", portfolio=None):
+    def checkpoint_scope(
+        self, company_name, trade_date, asset_type: str = "stock", portfolio=None,
+        *, news_boundary: NewsBoundary | None = None,
+    ):
         """Context-manager form of begin/end_checkpoint for the propagate path."""
         try:
-            yield self.begin_checkpoint(company_name, trade_date, asset_type, portfolio)
+            yield self.begin_checkpoint(
+                company_name, trade_date, asset_type, portfolio, news_boundary=news_boundary
+            )
         finally:
             self.end_checkpoint()
 
-    def clear_checkpoint_on_success(self, company_name, trade_date, asset_type: str = "stock", portfolio=None):
+    def clear_checkpoint_on_success(
+        self, company_name, trade_date, asset_type: str = "stock", portfolio=None,
+        *, news_boundary: NewsBoundary | None = None,
+    ):
         """Drop a completed run's checkpoint so a later run starts fresh (#1249)."""
         if self.config.get("checkpoint_enabled"):
             clear_checkpoint(
                 self.config["data_cache_dir"], company_name, str(trade_date),
-                self._run_signature(asset_type, portfolio),
+                self._run_signature(asset_type, portfolio, news_boundary=news_boundary),
             )
 
     def run_settings(self) -> dict:
@@ -290,7 +329,10 @@ class TradingAgentsGraph:
         stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         return Path(self.config["results_dir"]) / "reports" / f"{safe_ticker_component(ticker)}_{stamp}"
 
-    def create_run_state(self, company_name, trade_date, asset_type: str = "stock", portfolio=None):
+    def create_run_state(
+        self, company_name, trade_date, asset_type: str = "stock", portfolio=None,
+        *, news_boundary: NewsBoundary | None = None,
+    ):
         """Build a run's initial state; propagate() and the CLI both start here.
 
         Injects the resolved instrument identity for every agent (#814). The
@@ -298,13 +340,27 @@ class TradingAgentsGraph:
         and loads them alongside the analysts (see ``_memory_step``).
         """
         trade_date = _validate_trade_date(trade_date)
-        return self.propagator.create_initial_state(
-            company_name,
-            trade_date,
-            asset_type=asset_type,
-            instrument_context=self.resolve_instrument_context(company_name, asset_type, trade_date),
-            portfolio_context=portfolio.render(company_name) if portfolio is not None else "",
-        )
+        with run_config(self.config):
+            config = get_config()
+            if news_boundary is None:
+                if getattr(self, "_resuming", False):
+                    news_boundary = self._checkpoint_news_boundary
+                else:
+                    news_boundary = live_news_boundary(config)
+            state = self.propagator.create_initial_state(
+                company_name,
+                trade_date,
+                asset_type=asset_type,
+                instrument_context=self.resolve_instrument_context(company_name, asset_type, trade_date),
+                portfolio_context=portfolio.render(company_name) if portfolio is not None else "",
+            )
+        state.update(_news_boundary_state(news_boundary))
+        if news_boundary is not None and news_boundary.error is not None:
+            state["news_archive_error"] = news_boundary.error
+        sentiment = read_daily_sentiment_context(config, news_boundary)
+        if sentiment is not None:
+            state["qianliyan_daily_sentiment"] = sentiment
+        return state
 
     def _memory_step(self, state):
         """The graph's Memory Log step, alongside the analysts (#1428): settle every
@@ -373,7 +429,11 @@ class TradingAgentsGraph:
     def _run_graph(self, company_name, trade_date, asset_type: str = "stock",
                    checkpoint_thread_id: str | None = None, portfolio=None):
         """Execute the graph and write the resulting state to disk and memory log."""
-        init_agent_state = self.create_run_state(company_name, trade_date, asset_type, portfolio)
+        news_boundary = get_config().get(BOUNDARY_KEY)
+        boundary_args = {"news_boundary": news_boundary} if news_boundary is not None else {}
+        init_agent_state = self.create_run_state(
+            company_name, trade_date, asset_type, portfolio, **boundary_args
+        )
         args = self.propagator.get_graph_args()
 
         # Inject the checkpoint thread_id (from checkpoint_scope) so the same
@@ -395,14 +455,26 @@ class TradingAgentsGraph:
                 if state is not None:
                     final_state.update(state)
         else:
-            final_state = self.graph.invoke(graph_input, **args)
+            if boundary := self._run_news_boundary(graph_input):
+                with run_config(self._analysis_config(boundary)):
+                    final_state = self.graph.invoke(graph_input, **args)
+            else:
+                final_state = self.graph.invoke(graph_input, **args)
 
         self.record_decision(company_name, trade_date, final_state)
 
         # Clear checkpoint on successful completion to avoid stale state.
-        self.clear_checkpoint_on_success(company_name, trade_date, asset_type, portfolio)
+        self.clear_checkpoint_on_success(company_name, trade_date, asset_type, portfolio, **boundary_args)
 
         return final_state, run_rating(final_state)
+
+    def _analysis_config(self, news_boundary: NewsBoundary | None) -> dict:
+        return self.config if news_boundary is None else {**self.config, BOUNDARY_KEY: news_boundary}
+
+    def _run_news_boundary(self, graph_input) -> NewsBoundary | None:
+        if graph_input is None:
+            return self._checkpoint_news_boundary
+        return _news_boundary_from_state(graph_input)
 
     def stream_run(self, graph_input, **args):
         """Stream a run as ``(messages, state)`` pairs.
@@ -419,7 +491,7 @@ class TradingAgentsGraph:
         # The graph's own config serves every tool call, as in propagate(), even
         # when the process-wide config has changed since. Each step runs in the
         # run's context, so the caller keeps its own between steps.
-        context = run_config_context(self.config)
+        context = run_config_context(self._analysis_config(self._run_news_boundary(graph_input)))
         stream = context.run(self.graph.stream, graph_input, subgraphs=True, **args)
         try:
             while (step := context.run(next, stream, None)) is not None:
@@ -464,6 +536,9 @@ class TradingAgentsGraph:
             "final_rating": run_rating(final_state),
             "run_settings": self.run_settings(),
         }
+        for field in ("analysis_cutoff_at", "news_archive_snapshot", "qianliyan_daily_sentiment"):
+            if field in final_state:
+                entry[field] = final_state[field]
 
         # A ticker that would escape the results directory is rejected.
         safe_ticker = safe_ticker_component(final_state["company_of_interest"])
@@ -474,3 +549,22 @@ class TradingAgentsGraph:
         with open(log_path, "w", encoding="utf-8") as f:
             # Reports can be in any language and this file is read by a person.
             json.dump(entry, f, indent=4, ensure_ascii=False)
+
+
+def _news_boundary_state(boundary: NewsBoundary | None) -> dict[str, str]:
+    if boundary is None or boundary.as_of is None or boundary.snapshot is None:
+        return {}
+    return {
+        "analysis_cutoff_at": boundary.as_of.isoformat(),
+        "news_archive_snapshot": boundary.snapshot,
+    }
+
+
+def _news_boundary_from_state(state) -> NewsBoundary | None:
+    if not isinstance(state, dict):
+        return None
+    if (error := state.get("news_archive_error")) is not None:
+        return NewsBoundary(None, None, error)
+    if (cutoff := state.get("analysis_cutoff_at")) and (snapshot := state.get("news_archive_snapshot")):
+        return NewsBoundary(datetime.fromisoformat(cutoff), snapshot)
+    return None

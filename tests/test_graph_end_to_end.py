@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import copy
 import time
+from datetime import UTC, datetime
 
 import pandas as pd
 import pytest
@@ -21,6 +22,9 @@ from pydantic import Field
 from tradingagents.agents import context, schemas
 from tradingagents.agents.analysts import sentiment_analyst
 from tradingagents.dataflows import router
+from tradingagents.dataflows.config import get_config
+from tradingagents.dataflows.errors import VendorUnavailableError
+from tradingagents.dataflows.vendors import qianliyan
 from tradingagents.dataflows.vendors.yahoo import market as yahoo_market, snapshot
 from tradingagents.default_config import DEFAULT_CONFIG
 from tradingagents.graph import trading_graph
@@ -233,6 +237,115 @@ def test_a_streamed_run_reads_its_own_graph_config(tmp_path, monkeypatch, offlin
 
     assert seen and set(seen) == {"French"}
     assert set(between) == {"German"}
+
+
+@pytest.mark.unit
+def test_qianliyan_stream_uses_the_initial_state_boundary(tmp_path, monkeypatch, offline):
+    pins = []
+    news_boundaries = []
+    cutoff = datetime(2026, 1, 9, 16, tzinfo=UTC)
+
+    def pin(config):
+        boundary = qianliyan.NewsBoundary(cutoff, f"snapshot-{len(pins)}")
+        pins.append(boundary)
+        return boundary
+
+    def read_news(*args):
+        news_boundaries.append(get_config()[qianliyan.BOUNDARY_KEY])
+        return "News from the pinned archive"
+
+    monkeypatch.setattr(qianliyan, "pin_news_snapshot", pin)
+    for tool in qianliyan.NEWS_TOOLS:
+        monkeypatch.setitem(router.VENDOR_METHODS[tool], "qianliyan", read_news)
+    graph = _graph(
+        tmp_path, monkeypatch, ScriptedModel(),
+        tool_vendors=dict.fromkeys(qianliyan.NEWS_TOOLS, "qianliyan"),
+    )
+
+    initial = graph.create_run_state("NVDA", TRADE_DATE)
+    final = None
+    for _, state in graph.stream_run(initial, **graph.propagator.get_graph_args()):
+        if state and "news_archive_snapshot" in state:
+            final = state
+
+    assert len(pins) == 1
+    # Two instrument reads (news and sentiment analysts), one global-news read.
+    assert news_boundaries == [pins[0]] * 3
+    assert final["analysis_cutoff_at"] == cutoff.isoformat()
+    assert final["news_archive_snapshot"] == pins[0].snapshot
+
+
+@pytest.mark.unit
+def test_qianliyan_live_checkpoint_restores_the_cutoff_across_graphs(tmp_path, monkeypatch, offline):
+    from tradingagents.memory.settlement import Settlement
+
+    pins = []
+    cutoff = datetime(2026, 1, 9, 16, tzinfo=UTC)
+
+    def pin(config):
+        boundary = qianliyan.NewsBoundary(cutoff, f"snapshot-{cutoff.hour}")
+        pins.append(boundary)
+        return boundary
+
+    monkeypatch.setattr(qianliyan, "pin_news_snapshot", pin)
+    monkeypatch.setattr(
+        trading_graph.TradingAgentsGraph, "settle_all_pending", lambda *a, **k: Settlement(),
+    )
+    config = {"checkpoint_enabled": True, "tool_vendors": {"get_news": "qianliyan"}}
+    first = _graph(tmp_path, monkeypatch, ScriptedModel(fail_at=12), **config)
+    with pytest.raises(RuntimeError, match="provider unavailable"):
+        first.propagate("NVDA", TRADE_DATE)
+
+    cutoff = cutoff.replace(hour=18)
+    model = ScriptedModel()
+    retry = _graph(tmp_path, monkeypatch, model, **config)
+    result, signal = retry.propagate("NVDA", TRADE_DATE)
+
+    assert signal == "Overweight"
+    assert len(pins) == 1
+    assert result["analysis_cutoff_at"] == pins[0].as_of.isoformat()
+    assert result["news_archive_snapshot"] == "snapshot-16"
+    resumed_calls = len(model.calls)
+
+    fresh, _ = retry.propagate("NVDA", TRADE_DATE)
+    assert len(pins) == 2
+    assert fresh["news_archive_snapshot"] == "snapshot-18"
+    assert len(model.calls) - resumed_calls > resumed_calls
+
+
+@pytest.mark.unit
+def test_strict_archive_read_failure_keeps_backtest_cell_retryable(tmp_path, monkeypatch, offline):
+    from tradingagents.backtest import run_backtest
+    from tradingagents.dataflows import news_replay
+    from tradingagents.memory.settlement import Settlement
+
+    unavailable = True
+
+    def read_news(*args):
+        if unavailable:
+            raise VendorUnavailableError("Archive read timed out")
+        return "News from the pinned archive"
+
+    monkeypatch.setattr(
+        news_replay, "pin_news_snapshot", lambda config, cutoff: qianliyan.NewsBoundary(cutoff, "boundary"),
+    )
+    monkeypatch.setitem(router.VENDOR_METHODS["get_news"], "qianliyan", read_news)
+    graph = _graph(tmp_path, monkeypatch, ScriptedModel(), checkpoint_enabled=True)
+    monkeypatch.setattr(trading_graph.TradingAgentsGraph, "settle_pending", lambda *a: Settlement())
+    options = {
+        "run_id": "strict", "decision_time": "14:00", "decision_timezone": "UTC",
+        "selected_analysts": ("news",),
+    }
+
+    failed = run_backtest(["NVDA"], [TRADE_DATE], graph.config, **options)
+    assert failed.cells_run == 0
+    assert failed.failures == [("NVDA", TRADE_DATE, "Archive read timed out")]
+
+    unavailable = False
+    result = run_backtest(["NVDA"], [TRADE_DATE], graph.config, **options)
+    assert result.cells_run == 1 and result.skipped == 0
+    assert result.failures == []
+    assert result.news_boundaries == failed.news_boundaries
 
 
 class LoopingModel(ScriptedModel):

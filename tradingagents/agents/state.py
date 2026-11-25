@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, NotRequired
 
 from langgraph.graph import MessagesState
 from typing_extensions import TypedDict
@@ -47,6 +47,10 @@ class AgentState(MessagesState):
     asset_type: Annotated[str, "Asset type under analysis such as stock or crypto"]
     instrument_context: Annotated[str, "Deterministic ticker identity resolved at run start"]
     trade_date: Annotated[str, "The analysis date; data is served as of it"]
+    analysis_cutoff_at: NotRequired[str]
+    news_archive_snapshot: NotRequired[str]
+    news_archive_error: NotRequired[str]
+    qianliyan_daily_sentiment: NotRequired[str]
 
     # research step
     market_report: Annotated[str, "Report from the Market Analyst"]

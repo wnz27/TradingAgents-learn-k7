@@ -213,31 +213,20 @@ def run_analysis(checkpoint: bool | None = None, portfolio=None, flags=None):
         )
         update_display(layout, spinner_text, stats_handler=stats_handler, start_time=start_time)
 
-        # The same initial state propagate() builds, with the resolved
-        # instrument identity; the graph's Memory Log step settles past
-        # decisions and loads their lessons alongside the analysts.
-        init_agent_state = graph.create_run_state(
-            selections["ticker"], selections["analysis_date"], selections["asset_type"], portfolio
-        )
-        # Pass callbacks to graph config for tool execution tracking
-        # (LLM tracking is handled separately via LLM constructor)
-        args = graph.propagator.get_graph_args(callbacks=[stats_handler])
-
-        # Recompile with a checkpointer and inject the thread_id so --checkpoint
-        # actually saves and resumes on the CLI path (#1249); a no-op when
-        # checkpointing is disabled. Torn down in the finally below.
-        checkpoint_tid = graph.begin_checkpoint(
-            selections["ticker"], selections["analysis_date"], selections["asset_type"], portfolio
-        )
-        if checkpoint_tid is not None:
-            args.setdefault("config", {}).setdefault("configurable", {})["thread_id"] = checkpoint_tid
-            _announce_checkpoint_state(graph, selections["ticker"], selections["analysis_date"])
-
         # Stream the analysis. On resume, feed None so LangGraph continues the
-        # interrupted run instead of re-appending the initial state (#1249); the
-        # try/finally tears the checkpointer down even if the stream raises.
+        # interrupted run instead of re-appending the initial state (#1249).
         trace = []
+        run_args = selections["ticker"], selections["analysis_date"], selections["asset_type"], portfolio
         try:
+            # Resolve the checkpoint before building state so a retry retains
+            # the original archive boundary.
+            checkpoint_tid = graph.begin_checkpoint(*run_args)
+            init_agent_state = graph.create_run_state(*run_args)
+            args = graph.propagator.get_graph_args(callbacks=[stats_handler])
+            if checkpoint_tid is not None:
+                args.setdefault("config", {}).setdefault("configurable", {})["thread_id"] = checkpoint_tid
+                _announce_checkpoint_state(graph, selections["ticker"], selections["analysis_date"])
+
             for messages, chunk in graph.stream_run(graph.checkpoint_input(init_agent_state), **args):
                 for message in messages:
                     msg_id = getattr(message, "id", None)
@@ -351,9 +340,7 @@ def run_analysis(checkpoint: bool | None = None, portfolio=None, flags=None):
             # later run starts fresh. A mid-stream failure skips both, keeping
             # the checkpoint for resume.
             graph.record_decision(selections["ticker"], selections["analysis_date"], final_state)
-            graph.clear_checkpoint_on_success(
-                selections["ticker"], selections["analysis_date"], selections["asset_type"], portfolio
-            )
+            graph.clear_checkpoint_on_success(*run_args)
         finally:
             # Always restore the plain uncheckpointed graph, even on failure.
             graph.end_checkpoint()

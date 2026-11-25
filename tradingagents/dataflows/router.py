@@ -21,6 +21,9 @@ from tradingagents.dataflows.vendors.fred import get_macro_data as get_fred_macr
 from tradingagents.dataflows.vendors.polymarket import (
     get_prediction_markets as get_polymarket_prediction_markets,
 )
+from tradingagents.dataflows.vendors.qianliyan import BOUNDARY_KEY, selected_for_tool
+from tradingagents.dataflows.vendors.qianliyan import get_global_news as get_qianliyan_global_news
+from tradingagents.dataflows.vendors.qianliyan import get_news as get_qianliyan_news
 from tradingagents.dataflows.vendors.sec_edgar import (
     get_balance_sheet as get_sec_edgar_balance_sheet,
     get_cashflow as get_sec_edgar_cashflow,
@@ -129,10 +132,12 @@ VENDOR_METHODS = {
     "get_news": {
         "alpha_vantage": get_alpha_vantage_news,
         "yfinance": get_news_yfinance,
+        "qianliyan": get_qianliyan_news,
     },
     "get_global_news": {
         "yfinance": get_global_news_yfinance,
         "alpha_vantage": get_alpha_vantage_global_news,
+        "qianliyan": get_qianliyan_global_news,
     },
     "get_insider_transactions": {
         "alpha_vantage": get_alpha_vantage_insider_transactions,
@@ -206,7 +211,7 @@ def route_to_vendor(method: str, *args, **kwargs):
     if method not in VENDOR_METHODS:
         raise ValueError(f"Method '{method}' not supported")
 
-    all_available_vendors = list(VENDOR_METHODS[method].keys())
+    all_available_vendors = [v for v in VENDOR_METHODS[method] if v != "qianliyan"]
 
     # The configured vendor list IS the chain: we do NOT silently fall back to
     # vendors the user did not choose (#988/#289) — that returned data from an
@@ -215,7 +220,11 @@ def route_to_vendor(method: str, *args, **kwargs):
     # The "default" sentinel (no explicit config) uses all available vendors.
     explicit = [v for v in primary_vendors if v and v != "default"]
     if explicit:
-        vendor_chain = [v for v in explicit if v in VENDOR_METHODS[method]]
+        qianliyan_enabled = selected_for_tool(get_config(), method)
+        vendor_chain = [
+            v for v in explicit
+            if v in VENDOR_METHODS[method] and (v != "qianliyan" or qianliyan_enabled)
+        ]
         if not vendor_chain:
             raise ValueError(
                 f"Configured vendor(s) {explicit} not available for '{method}'. "
@@ -231,6 +240,13 @@ def route_to_vendor(method: str, *args, **kwargs):
     for vendor in vendor_chain:
         vendor_impl = VENDOR_METHODS[method][vendor]
         impl_func = vendor_impl[0] if isinstance(vendor_impl, list) else vendor_impl
+
+        if vendor == "qianliyan":
+            config = get_config()
+            if config.get("_qianliyan_replay_run") and config.get(BOUNDARY_KEY):
+                # A strict replay must leave a cell retryable after an archive
+                # read failure rather than score it with missing evidence.
+                return impl_func(*args, **kwargs)
 
         try:
             return impl_func(*args, **kwargs)

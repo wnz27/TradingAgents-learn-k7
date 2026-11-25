@@ -107,7 +107,8 @@ def test_portfolio_manager_prompt_states_constraint():
 
 
 @pytest.mark.unit
-def test_sentiment_prompt_states_constraint(monkeypatch):
+@pytest.mark.parametrize("daily", [None, "## Archived Daily Market Sentiment\nus_vix: 18.12"])
+def test_sentiment_prompt_states_constraint(monkeypatch, daily):
     from tradingagents.agents.schemas import SentimentBand, SentimentReport
 
     # Pre-fetched sources are stubbed so the prompt builds without network I/O.
@@ -122,12 +123,18 @@ def test_sentiment_prompt_states_constraint(monkeypatch):
     ))
     sentiment.create_sentiment_analyst(llm)({
         "company_of_interest": "NVDA", "trade_date": "2026-01-15",
-        "asset_type": "stock", "messages": [],
+        "asset_type": "stock", "messages": [], "qianliyan_daily_sentiment": daily,
     })
     text = _prompt_text(captured["prompt"])
     assert NO_EXTERNAL_TOOLS in text
     # This agent binds no tools, so tool-range wording must not reappear.
     assert "tool-call date ranges" not in text
+    if daily:
+        assert daily in text
+        assert text.index(daily) > text.index("<end_of_reddit>")
+        assert "as separate market context" in text
+    else:
+        assert "Archived Daily Market Sentiment" not in text
 
 
 @pytest.mark.unit

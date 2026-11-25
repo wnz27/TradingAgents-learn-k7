@@ -3,7 +3,7 @@
 The node fetches its sources before calling the model and puts them in the
 prompt, so the model reports on data it was given rather than inventing posts:
 
-  1. News headlines: Yahoo Finance
+  1. News headlines from the configured provider
   2. StockTwits messages: the cashtag stream, with Bullish/Bearish tags
   3. Reddit posts: r/wallstreetbets, r/stocks, r/investing, or crypto communities for a crypto pair
 
@@ -83,6 +83,7 @@ def create_sentiment_analyst(llm):
             stocktwits_block=stocktwits_block,
             reddit_block=reddit_block,
             subreddits=subreddits,
+            daily_sentiment=state.get("qianliyan_daily_sentiment"),
         )
 
         prompt = ChatPromptTemplate.from_messages(
@@ -136,6 +137,7 @@ def _build_system_message(
     stocktwits_block: str,
     reddit_block: str,
     subreddits: tuple[str, ...] = DEFAULT_SUBREDDITS,
+    daily_sentiment: str | None = None,
 ) -> str:
     """Assemble the sentiment-analyst system message with structured data blocks."""
     if subreddits == DEFAULT_SUBREDDITS:
@@ -144,11 +146,19 @@ def _build_system_message(
         character = f"r/{subreddits[0]} leans toward the coin's holders; r/CryptoCurrency and r/CryptoMarkets are broader"
     else:
         character = "r/CryptoCurrency and r/CryptoMarkets are broad crypto communities"
+    daily_section = ""
+    if daily_sentiment:
+        daily_section = (
+            f"\n\n{daily_sentiment}\n\n"
+            "Use the archived daily values as separate market context. Preserve their "
+            "series, units, and trading dates. Treat social posts and macroeconomic "
+            "indicators as independent evidence."
+        )
     return f"""You are a financial market sentiment analyst. Your task is to produce a comprehensive sentiment report for {ticker} covering the period from {start_date} to {end_date}, drawing on three complementary data sources that have already been collected for you.
 
 ## Data sources (pre-fetched, in this prompt)
 
-### News headlines — Yahoo Finance, past 7 days
+### News headlines — past 7 days
 Institutional framing. Fact-driven, slower-moving signal.
 
 <start_of_news>
@@ -167,7 +177,7 @@ Community discussion, without vote or comment counts. Subreddit character matter
 
 <start_of_reddit>
 {reddit_block}
-<end_of_reddit>
+<end_of_reddit>{daily_section}
 
 ## How to analyze this data (best practices)
 

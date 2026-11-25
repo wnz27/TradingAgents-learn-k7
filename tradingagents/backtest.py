@@ -25,7 +25,9 @@ from pathlib import Path
 
 from tradingagents.agents.rating import RATING_REVIEW
 from tradingagents.dataflows.date_window import get_current_date
+from tradingagents.dataflows.news_replay import REPLAY_DB, StrictNewsReplay
 from tradingagents.dataflows.symbols import safe_ticker_component
+from tradingagents.dataflows.vendors.qianliyan import NEWS_TOOLS, NewsBoundary
 from tradingagents.graph.trading_graph import TradingAgentsGraph
 from tradingagents.memory import TradingMemoryLog
 
@@ -84,6 +86,7 @@ class BacktestResult:
     skipped: int = 0
     failures: list[tuple[str, str, str]] = field(default_factory=list)
     settlement_failures: list[tuple[str, str]] = field(default_factory=list)
+    news_boundaries: dict[tuple[str, str], NewsBoundary] = field(default_factory=dict)
 
 
 # What each rating claims will happen, so an outcome can be scored against it.
@@ -149,6 +152,9 @@ def run_backtest(
     selected_analysts=("market", "social", "news", "fundamentals"),
     run_id: str | None = None,
     progress: Callable[[int, int, str, str], None] | None = None,
+    *,
+    decision_time: str | None = None,
+    decision_timezone: str | None = None,
 ) -> BacktestResult:
     """Analyze every ticker on every date, into a memory log of this run's own.
 
@@ -157,6 +163,8 @@ def run_backtest(
     interrupted sweep resumes by being run again. ``progress(done, total,
     ticker, date)`` is called before each cell that runs.
     """
+    if (decision_time is None) != (decision_timezone is None):
+        raise ValueError("Strict news backtests require both a decision time and time zone")
     runs = Path(config["results_dir"]) / "backtest"
     if run_id:
         # run_id becomes a path segment, so it is validated like a ticker: an
@@ -168,6 +176,15 @@ def run_backtest(
     run_dir = runs / run_id
     run_config = {**config, "results_dir": str(run_dir),
                   "memory_log_path": str(run_dir / "trading_memory.md")}
+    replay = None
+    if decision_time is not None and decision_timezone is not None:
+        replay = StrictNewsReplay(run_dir, run_config, decision_time, decision_timezone)
+        run_config["_qianliyan_replay_run"] = str(run_dir.resolve())
+        run_config["tool_vendors"] = {
+            **run_config.get("tool_vendors", {}), **dict.fromkeys(NEWS_TOOLS, "qianliyan")
+        }
+    elif (run_dir / REPLAY_DB).exists():
+        raise ValueError("Resume this strict news backtest with its decision time and time zone")
 
     graph = TradingAgentsGraph(selected_analysts, config=run_config)
     result = BacktestResult(run_id=run_id, log_path=Path(run_config["memory_log_path"]))
@@ -178,11 +195,22 @@ def run_backtest(
     cells = [(ticker, date) for ticker in tickers for date in dates]
     todo = [cell for cell in cells if cell not in done]
     result.skipped = len(cells) - len(todo)
+    if replay is not None:
+        for cell in cells:
+            if cell in done:
+                if replay.saved_boundary(*cell) is None:
+                    raise ValueError("Completed strict backtest cell has no saved archive boundary")
+                result.news_boundaries[cell] = replay.boundary(*cell)
     for index, (ticker, date) in enumerate(todo, 1):
         if progress:
             progress(index, len(todo), ticker, date)
         try:
-            graph.propagate(ticker, date, asset_type, portfolio=portfolio)
+            kwargs = {}
+            if replay is not None:
+                boundary = replay.boundary(ticker, date)
+                result.news_boundaries[(ticker, date)] = boundary
+                kwargs["news_boundary"] = boundary
+            graph.propagate(ticker, date, asset_type, portfolio=portfolio, **kwargs)
             result.cells_run += 1
         except Exception as exc:  # one unreachable vendor must not end the sweep
             logger.warning("Backtest cell %s %s failed: %s", ticker, date, exc)

@@ -80,7 +80,7 @@ def build_default_config() -> dict:
     Read when the package is imported, as DEFAULT_CONFIG; call it again to see
     the environment as it is now.
     """
-    return _apply_env_overrides({
+    config = _apply_env_overrides({
         "results_dir": os.getenv("TRADINGAGENTS_RESULTS_DIR") or os.path.join(_TRADINGAGENTS_HOME, "logs"),
         "data_cache_dir": os.getenv("TRADINGAGENTS_CACHE_DIR") or os.path.join(_TRADINGAGENTS_HOME, "cache"),
         "memory_log_path": os.getenv("TRADINGAGENTS_MEMORY_LOG_PATH") or os.path.join(_TRADINGAGENTS_HOME, "memory", "trading_memory.md"),
@@ -204,6 +204,24 @@ def build_default_config() -> dict:
         },
 
     })
+    archive_settings = {
+        key: value for key, name in (
+            ("base_url", "TRADINGAGENTS_QIANLIYAN_BASE_URL"),
+            ("archive_path", "TRADINGAGENTS_QIANLIYAN_ARCHIVE_PATH"),
+        ) if (value := os.environ.get(name, "").strip())
+    }
+    daily_sentiment = os.environ.get("TRADINGAGENTS_QIANLIYAN_DAILY_SENTIMENT", "").strip()
+    if daily_sentiment and _coerce(daily_sentiment, False):
+        archive_settings["daily_sentiment"] = True
+    if archive_settings:
+        config["qianliyan"] = archive_settings
+    for tool, variable in (
+        ("get_news", "TRADINGAGENTS_GET_NEWS_VENDORS"),
+        ("get_global_news", "TRADINGAGENTS_GET_GLOBAL_NEWS_VENDORS"),
+    ):
+        if value := os.environ.get(variable, "").strip():
+            config["tool_vendors"][tool] = value
+    return config
 
 
 DEFAULT_CONFIG = build_default_config()

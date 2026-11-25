@@ -120,6 +120,12 @@ def backtest(
     run_id: str = typer.Option(
         None, "--run-id", help="Continue an earlier sweep: its cells are skipped and its log reused"
     ),
+    decision_time: str | None = typer.Option(
+        None, "--decision-time", help="Local HH:MM cutoff for strict archive news"
+    ),
+    decision_timezone: str | None = typer.Option(
+        None, "--decision-timezone", help="IANA time zone for the strict news cutoff"
+    ),
 ):
     """Score past decisions over a grid of tickers and dates."""
 
@@ -145,6 +151,8 @@ def backtest(
 
     kwargs = {"asset_type": kind.value, "portfolio": book, "run_id": run_id, "progress": show_progress,
               "selected_analysts": [a.value for a in chosen]}
+    if decision_time is not None or decision_timezone is not None:
+        kwargs.update(decision_time=decision_time, decision_timezone=decision_timezone)
 
     try:
         result = run_backtest(names, dates, DEFAULT_CONFIG, **kwargs)
