@@ -132,6 +132,8 @@ Research Manager、Trader、Portfolio Manager、Sentiment Analyst 首选模型�
 
 ### 5.1 工具边界与供应商路由
 
+资讯默认来源、切换示例、接入步骤与模块图见[市场资讯来源与扩展指南](MARKET_INFORMATION_GUIDE.md)。
+
 市场、新闻和基本面分析师通过各自的 `TOOLS` 元组声明能力。LangGraph 用同一元组构建 `ToolNode`，并从图状态注入 `company_of_interest` 和 `trade_date`。模型可指定指标、查询主题或回看窗口。工具在调用供应商前规范化日期，对时间窗执行分析日上限，对无法解析的起点和倒序区间返回纠正提示。整个区间都在分析日之后时，工具保留原区间长度并将截止日回移到分析日。直接调用工具实现时，需要显式传入分析日或已经裁剪的窗口。 [分析师规格](tradingagents/graph/analyst_execution.py)、[工具子图](tradingagents/graph/setup.py)、[工具接口](tradingagents/agents/tools.py)、[日期边界](tradingagents/dataflows/date_window.py)。
 
 | 分析输入 | 工具与调用方 | 默认来源及可选来源 |

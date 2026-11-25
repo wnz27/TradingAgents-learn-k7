@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "dbcdb66e-cf92-464d-bbd0-b1adebe83fb1",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-market-information-sources-20261124-152316/candidate.json",
+  "output": "/Users/f27/learn/fin_ai/TradingAgents-learn-k7/.archify/architecture-market-information-sources-20261124-152316/market-information-sources.html",
+  "specification": {
+    "sha256": "7a3b483e92d8184a22ba4880645996b8411995d2050c30a683c48466248d72fa",
+    "bytes": 5794
+  },
+  "artifact": {
+    "sha256": "c3a223a8d3737142b35d77af3758629fea1e54de4440cfffc9e20f9002d9f321",
+    "bytes": 948280
+  }
+}

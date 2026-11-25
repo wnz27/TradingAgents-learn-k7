@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "TradingAgents 市场资讯来源与供应商路由",
+    "output": ".archify/architecture-market-information-sources-20261124-152316/market-information-sources.html",
+    "locale": "zh-CN",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/wnz27/TradingAgents-learn-k7.git",
+      "revision": "867df76ba9798c0ffc96d293410d01b1fa14da2c"
+    }
+  },
+  "layout": { "mode": "auto" },
+  "components": [
+    {
+      "id": "news-analyst", "type": "backend", "label": "新闻分析师", "sublabel": "新闻、宏观指标与事件赔率",
+      "sources": [{ "path": "tradingagents/agents/analysts/news_analyst.py", "line": 12, "end_line": 18 }, { "path": "tradingagents/agents/analysts/news_analyst.py", "line": 51, "end_line": 61 }]
+    },
+    {
+      "id": "sentiment-analyst", "type": "backend", "label": "情绪分析师", "sublabel": "预取标的新闻和社区帖子",
+      "sources": [{ "path": "tradingagents/agents/analysts/sentiment_analyst.py", "line": 57, "end_line": 86 }]
+    },
+    {
+      "id": "fundamentals-analyst", "type": "backend", "label": "基本面分析师", "sublabel": "使用内部人交易工具",
+      "sources": [{ "path": "tradingagents/agents/analysts/fundamentals_analyst.py", "line": 13, "end_line": 20 }, { "path": "tradingagents/agents/analysts/fundamentals_analyst.py", "line": 52, "end_line": 62 }]
+    },
+    {
+      "id": "tools", "type": "backend", "label": "资讯工具", "sublabel": "分析日约束与统一调用",
+      "sources": [{ "path": "tradingagents/agents/tools.py", "line": 171, "end_line": 229 }, { "path": "tradingagents/agents/tools.py", "line": 233, "end_line": 264 }, { "path": "tradingagents/agents/tools.py", "line": 267, "end_line": 291 }]
+    },
+    {
+      "id": "router", "type": "backend", "label": "供应商路由", "sublabel": "查注册表，首个正常返回即结束",
+      "sources": [{ "path": "tradingagents/dataflows/router.py", "line": 128, "end_line": 148 }, { "path": "tradingagents/dataflows/router.py", "line": 160, "end_line": 173 }, { "path": "tradingagents/dataflows/router.py", "line": 200, "end_line": 259 }]
+    },
+    {
+      "id": "run-config", "type": "backend", "label": "运行配置", "sublabel": "工具覆盖优先于类别配置",
+      "sources": [{ "path": "tradingagents/default_config.py", "line": 153, "end_line": 171 }, { "path": "tradingagents/dataflows/config.py", "line": 44, "end_line": 72 }]
+    },
+    {
+      "id": "yahoo", "type": "external", "label": "Yahoo Finance", "sublabel": "yfinance · 默认新闻及内部人交易",
+      "sources": [{ "path": "tradingagents/dataflows/vendors/yahoo/news.py", "line": 87, "end_line": 134 }, { "path": "tradingagents/dataflows/vendors/yahoo/news.py", "line": 155, "end_line": 201 }, { "path": "tradingagents/dataflows/vendors/yahoo/fundamentals.py", "line": 148, "end_line": 166 }]
+    },
+    {
+      "id": "alpha-vantage", "type": "external", "label": "Alpha Vantage", "sublabel": "可选新闻及内部人交易",
+      "sources": [{ "path": "tradingagents/dataflows/vendors/alpha_vantage/news.py", "line": 24, "end_line": 89 }, { "path": "tradingagents/dataflows/vendors/alpha_vantage/common.py", "line": 28, "end_line": 35 }]
+    },
+    {
+      "id": "macro-events", "type": "external", "label": "FRED 与 Polymarket", "sublabel": "宏观序列与实时事件赔率",
+      "sources": [{ "path": "tradingagents/dataflows/vendors/fred.py", "line": 167, "end_line": 204 }, { "path": "tradingagents/dataflows/vendors/polymarket.py", "line": 86, "end_line": 112 }]
+    },
+    {
+      "id": "social", "type": "external", "label": "StockTwits 与 Reddit", "sublabel": "标的消息流与社区 RSS",
+      "sources": [{ "path": "tradingagents/dataflows/vendors/stocktwits.py", "line": 74, "end_line": 101 }, { "path": "tradingagents/dataflows/vendors/reddit.py", "line": 248, "end_line": 280 }]
+    }
+  ],
+  "connections": [
+    { "id": "news-tools", "from": "news-analyst", "to": "tools", "label": "按需调用", "variant": "emphasis" },
+    { "id": "sentiment-tools", "from": "sentiment-analyst", "to": "tools", "label": "预取标的新闻" },
+    { "id": "fundamental-tools", "from": "fundamentals-analyst", "to": "tools", "label": "查询内部人交易" },
+    { "id": "sentiment-social", "from": "sentiment-analyst", "to": "social", "label": "直接预取社区", "variant": "dashed" },
+    { "id": "tools-router", "from": "tools", "to": "router", "label": "按工具名分派", "variant": "emphasis" },
+    { "id": "router-config", "from": "router", "to": "run-config", "label": "读取配置" },
+    { "id": "router-yahoo", "from": "router", "to": "yahoo", "label": "新闻类默认", "variant": "emphasis" },
+    { "id": "router-alpha", "from": "router", "to": "alpha-vantage", "label": "被路由选中时", "variant": "dashed" },
+    { "id": "router-macro-events", "from": "router", "to": "macro-events", "label": "各自独立配置" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "策略与注册表", "items": ["VENDOR_METHODS 按工具名和供应商 ID 注册可替换的函数。", "供应商适配器把统一调用转换为各自的外部请求。"] },
+    { "dot": "emerald", "title": "顺序回退", "items": ["显式配置逗号分隔的供应商链，按顺序尝试已注册的实现。", "异常时尝试下一项。正文、空字符串和缺数说明正常返回时都会结束调用。"] },
+    { "dot": "rose", "title": "日期与凭证", "items": ["FRED 需要 FRED_API_KEY，按分析日钉住数据版本。", "Polymarket 使用公共 Gamma API，历史分析日停供实时赔率。", "社区帖子按分析窗口过滤，近期数据流可能覆盖不了历史区间。"] }
+  ]
+}
