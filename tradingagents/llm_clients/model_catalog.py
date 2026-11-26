@@ -164,6 +164,10 @@ MODEL_OPTIONS: ProviderModeOptions = {
             ("Custom model ID", "custom"),
         ],
     },
+    "longcat": {
+        "quick": [("LongCat-2.5", "LongCat-2.5")],
+        "deep": [("LongCat-2.5", "LongCat-2.5")],
+    },
     # Qwen: same model IDs across global (dashscope-intl) and China
     # (dashscope) endpoints, so the two provider keys share one model list.
     "qwen": _QWEN_MODELS,

@@ -77,6 +77,7 @@ export const HOSTED_PROVIDERS = [
   "anthropic",
   "google",
   "deepseek",
+  "longcat",
   "openrouter",
 ] as const;
 export type HostedProvider = (typeof HOSTED_PROVIDERS)[number];
@@ -92,6 +93,7 @@ export const PROVIDER_IDS = [
   "anthropic",
   "google",
   "deepseek",
+  "longcat",
   "openrouter",
   "openai-compatible",
 ] as const satisfies readonly (HostedProvider | "chatgpt" | "openai-compatible")[];

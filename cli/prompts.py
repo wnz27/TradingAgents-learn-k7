@@ -391,6 +391,7 @@ def _llm_provider_table() -> list[tuple[str, str, str | None]]:
         ("ChatGPT (Plus or Pro plan)", "chatgpt", "https://api.openai.com/v1"),
         ("xAI", "xai", "https://api.x.ai/v1"),
         ("DeepSeek", "deepseek", "https://api.deepseek.com"),
+        ("LongCat", "longcat", OPENAI_COMPATIBLE_PROVIDERS["longcat"].base_url),
         ("Qwen", "qwen", "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"),
         # Z.AI international, the platform ZHIPU_API_KEY belongs to; the CN
         # platform is the separate glm-cn key, chosen in the region prompt.

@@ -65,6 +65,7 @@ const providerFields: Record<ProviderId, Record<string, z.ZodType>> = {
   anthropic: { contextWindow },
   google: { contextWindow },
   deepseek: { contextWindow },
+  longcat: { contextWindow },
   openrouter: { contextWindow },
 };
 type ProviderBlocks = { "openai-compatible"?: ServerFields } & {

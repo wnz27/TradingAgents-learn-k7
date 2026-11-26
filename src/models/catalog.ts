@@ -18,6 +18,7 @@ export const CATALOG_PROVIDERS = [
   "anthropic",
   "google",
   "deepseek",
+  "longcat",
   "openrouter",
 ] as const;
 export type CatalogProvider = (typeof CATALOG_PROVIDERS)[number];
@@ -56,6 +57,7 @@ export const CATALOG: { readonly [P in CatalogProvider]: readonly { id: string; 
     { id: "deepseek-v4-pro", role: "default" },
     { id: "deepseek-flash", role: "fast" },
   ],
+  longcat: [{ id: "LongCat-2.5", role: "default" }],
   openrouter: [
     { id: "anthropic/claude-sonnet-5.5", role: "default" },
     { id: "openai/gpt-6.2-sol", role: "alt" },
@@ -72,6 +74,7 @@ export const METADATA_SOURCE: { readonly [P in CatalogProvider]: string } = {
   anthropic: "anthropic",
   google: "google",
   deepseek: "deepseek",
+  longcat: "longcat",
   openrouter: "openrouter",
 };
 

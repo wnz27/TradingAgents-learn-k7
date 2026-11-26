@@ -30,6 +30,8 @@ export const OPENAI_API_BASE = "https://api.openai.com/v1";
 /** Tauric's model API, OpenAI-compatible: reached with the same key as its data. */
 const TAURIC_MODELS_BASE = "https://api.tauric.ai/v1";
 
+const LONGCAT_API_BASE = "https://api.longcat.chat/openai/v1";
+
 type HostedRoute = {
   provider: HostedProvider;
   model: string;
@@ -135,6 +137,19 @@ const deepseekFailure: ProviderClassifier = ({ status, message: said }) => {
   if (status === 402) return noCredit("DeepSeek", said);
   return undefined;
 };
+
+/** Keep requests on LongCat's documented Responses fields while the SDK serializes full conversation history. */
+function longcatFetch(fetch: typeof globalThis.fetch = globalThis.fetch): typeof globalThis.fetch {
+  return (input, init) => {
+    if (typeof init?.body !== "string") return fetch(input, init);
+    const { include: _, store: __, tool_choice, tools, ...body } = JSON.parse(init.body);
+    // LongCat uses automatic tools. Without declarations a final answer cannot call another tool.
+    return fetch(input, {
+      ...init,
+      body: JSON.stringify(tool_choice === "none" ? body : { ...body, tools }),
+    });
+  };
+}
 
 /** OpenRouter's reasoning details carry the reasoning itself: a finished turn keeps the rest. */
 function withoutReasoningDetails(replay: Replay): Replay | undefined {
@@ -243,6 +258,29 @@ const HOSTED: Record<HostedProvider, Hosted> = {
     classify: deepseekFailure,
     // With tools, DeepSeek needs the reasoning of every earlier turn sent back: it is kept, in the session too.
     keepsReasoning: "conversation",
+  },
+  longcat: {
+    model: (route, fetch) =>
+      createOpenAI({ apiKey: route.apiKey, baseURL: LONGCAT_API_BASE, fetch: longcatFetch(fetch) }).responses(
+        route.model,
+      ),
+    step: (route) => (request) => {
+      const effort = stepReasoning(route, request.sampling?.thinking);
+      return {
+        sampling: {},
+        providerOptions: {
+          openai: {
+            // Inline tool calls and outputs on every request. The fetch adapter drops OpenAI's storage fields.
+            store: false,
+            forceReasoning: true,
+            ...(effort !== "provider-default" ? { reasoningEffort: effort } : {}),
+            ...promptCacheKey(request),
+          },
+        },
+      };
+    },
+    classify: ({ status, message: said }) =>
+      status === 401 ? keyRefused("LongCat", "https://longcat.chat/platform", said) : undefined,
   },
   openrouter: {
     model: (route, fetch) =>

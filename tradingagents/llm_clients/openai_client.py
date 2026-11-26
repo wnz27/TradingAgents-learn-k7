@@ -231,8 +231,8 @@ class ProviderSpec:
     """Declarative config for one OpenAI-compatible provider.
 
     The OpenAI-compatible family (OpenAI, xAI, DeepSeek, Qwen, GLM, MiniMax,
-    OpenRouter, Ollama, and any user endpoint) all speak the same Chat
-    Completions API and differ only by these fields — so one row here replaces
+    LongCat, OpenRouter, Ollama, and user endpoints) share the OpenAI SDK
+    and differ by these fields — so one row here replaces
     the former per-provider base-URL dict, auth handling, and client-class
     branches. Native Anthropic / Google use their own clients (genuinely
     different APIs) and are intentionally NOT in this registry.
@@ -254,7 +254,7 @@ class ProviderSpec:
     # (a fresh token per request) or raises when nobody is signed in. Its token goes
     # only to its pinned base_url, and never alongside an API key.
     credential: Callable[[], Callable[[], str]] | None = None
-    pinned_base_url: bool = False             # refuse any other endpoint for this provider
+    pinned_base_url: bool = False             # only send credentials to this provider's base_url
 
 
 # Single source of truth for the OpenAI-compatible provider family. Dual-region
@@ -264,6 +264,8 @@ OPENAI_COMPATIBLE_PROVIDERS: dict[str, ProviderSpec] = {
     "openai":     ProviderSpec(use_responses_api=True),
     "xai":        ProviderSpec(base_url="https://api.x.ai/v1"),
     "deepseek":   ProviderSpec(base_url="https://api.deepseek.com", chat_class=DeepSeekChatOpenAI),
+    "longcat":    ProviderSpec(base_url="https://api.longcat.chat/openai/v1",
+                               use_responses_api=True, pinned_base_url=True),
     "qwen":       ProviderSpec(base_url="https://dashscope-intl.aliyuncs.com/compatible-mode/v1"),
     "qwen-cn":    ProviderSpec(base_url="https://dashscope.aliyuncs.com/compatible-mode/v1"),
     "glm":        ProviderSpec(base_url="https://api.z.ai/api/paas/v4/"),
@@ -309,10 +311,8 @@ def is_openai_compatible(provider: str) -> bool:
 def _is_native_openai_base_url(base_url: str | None) -> bool:
     """True when ``base_url`` is unset or points at api.openai.com.
 
-    The Responses API (/v1/responses) only exists on native OpenAI. A custom
-    base_url on the ``openai`` provider (a proxy, gateway, or local server)
-    speaks only Chat Completions, so the Responses API must stay off there even
-    though the provider spec enables it (#1024).
+    A custom base_url on the ``openai`` provider can point to a proxy, gateway,
+    or local server that only supports Chat Completions (#1024).
     """
     if not base_url:
         return True
@@ -387,10 +387,9 @@ class OpenAIClient(BaseLLMClient):
                     f"(e.g. add {api_key_env}=your_key to your .env file)."
                 )
 
-            # The Responses API only exists on native OpenAI; if the user points
-            # the openai provider at a custom base_url (proxy/gateway/local), it
-            # only speaks Chat Completions, so keep Responses off there (#1024).
-            if spec.use_responses_api and _is_native_openai_base_url(base_url):
+            # Pinned providers declare Responses support for their official endpoint.
+            # Preserve Chat Completions for custom URLs on the openai provider (#1024).
+            if spec.use_responses_api and (spec.pinned_base_url or _is_native_openai_base_url(base_url)):
                 llm_kwargs["use_responses_api"] = True
         elif self.base_url:
             llm_kwargs["base_url"] = self.base_url

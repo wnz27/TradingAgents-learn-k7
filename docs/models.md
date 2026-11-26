@@ -14,6 +14,7 @@ The first session in a terminal with no model set walks through the choice. Late
 | Anthropic                | an API key                                                  | `ANTHROPIC_API_KEY`                                                  |
 | Google                   | an API key from AI Studio                                   | `GEMINI_API_KEY`, `GOOGLE_GENERATIVE_AI_API_KEY` or `GOOGLE_API_KEY` |
 | DeepSeek                 | an API key                                                  | `DEEPSEEK_API_KEY`                                                   |
+| LongCat                  | an API key                                                  | `LONGCAT_API_KEY`                                                    |
 | OpenRouter               | an API key                                                  | `OPENROUTER_API_KEY`                                                 |
 | OpenAI-compatible server | its address and model, and a key if it needs one            | `TRADINGAGENTS_MODEL_API_KEY`                                        |
 
@@ -32,6 +33,8 @@ tradingagents --model anthropic/claude-opus-5-5 --reasoning high
 A model is named `provider/id`. `--reasoning` takes `none`, `minimal`, `low`, `medium`, `high`, `xhigh` or `max`; a level the model does not offer becomes the nearest one above it. Without a setting, each provider's default applies. `TRADINGAGENTS_MODEL` names the model in the environment, between the flag and the config file.
 
 With no model named and exactly one provider connected, its default model is used.
+
+Select LongCat with `--model longcat/LongCat-2.5`, or set `TRADINGAGENTS_MODEL=longcat/LongCat-2.5`. [LongCat API documentation](https://longcat.chat/platform/docs/zh/)
 
 ## An OpenAI-compatible server
 

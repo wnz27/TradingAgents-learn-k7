@@ -30,5 +30,6 @@ export const KEY_VARS: { readonly [P in HostedProvider]: readonly string[] } = {
   anthropic: ["ANTHROPIC_API_KEY"],
   google: ["GEMINI_API_KEY", "GOOGLE_GENERATIVE_AI_API_KEY", "GOOGLE_API_KEY"],
   deepseek: ["DEEPSEEK_API_KEY"],
+  longcat: ["LONGCAT_API_KEY"],
   openrouter: ["OPENROUTER_API_KEY"],
 };

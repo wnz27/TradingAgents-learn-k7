@@ -2,6 +2,8 @@
 
 适用于 TradingAgents `0.7.1`（`9fa1196`）和当前的 Apple Silicon Mac。首轮沿用入门手册的 `AAPL`、`SPY`、`market` 分析师及本地 Ollama，只做历史评级回测。准备顺序是确认 Yahoo 出口、安装 Python 依赖、启动模型，最后用单次历史分析验收两条链路。
 
+使用 LongCat 托管模型时，可以跳过 Ollama 服务和权重准备。参见 [LongCat API 配置](#7-接入-longcat-api)。
+
 ## 1. 当前缺什么
 
 以下为 **2026 年 11 月 23 日**本机检查结果。换机器或网络后重新跑对应探针。
@@ -14,7 +16,7 @@
 | `qwen3:8b` 权重 | 本地模型清单中未发现该标签 | 预先拉取约 `5.2 GB` 的权重。当前工作目录所在卷可用约 `39 GiB`，运行内存另外以实际推理验收。 |
 | Yahoo Finance 历史行情 | 此前业务探针遇到限流，当前可用性待验收 | 用实际运行账户和网络取 `AAPL` 与 `SPY` 的历史日线。Yahoo 路线无需 API key。 |
 
-首轮只需这五项。Docker、数据库、券商账户、交易 API 和云模型账号可跳过。模型推理在本机运行，拉取依赖和权重需要下载出口，日常分析和结算仍需要 Yahoo Finance。可在项目 `.env` 中设置 `TRADINGAGENTS_NO_UPDATE_CHECK=1`，跳过启动时的更新和公告检查。 [项目依赖声明](pyproject.toml) · [Ollama 0.6.7 发布说明](https://github.com/ollama/ollama/releases/tag/v0.6.7) · [模型标签](https://ollama.com/library/qwen3:8b) · [更新检查](cli/updates.py)
+使用 Ollama 时，首轮准备表中五项即可。Docker、数据库、券商账户、交易 API 和云模型账号可跳过。拉取依赖和权重需要下载出口，日常分析和结算仍需要 Yahoo Finance。可在项目 `.env` 中设置 `TRADINGAGENTS_NO_UPDATE_CHECK=1`，跳过启动时的更新和公告检查。 [项目依赖声明](pyproject.toml) · [Ollama 0.6.7 发布说明](https://github.com/ollama/ollama/releases/tag/v0.6.7) · [模型标签](https://ollama.com/library/qwen3:8b) · [更新检查](cli/updates.py)
 
 ## 2. 准备下载和行情出口
 
@@ -102,6 +104,33 @@ PY
 | `news` 新闻与宏观 | Yahoo 新闻使用 `nexus-finance-prod.media.yahoo.com` 及 Yahoo Finance 搜索。需要 FRED 宏观序列时申请 `FRED_API_KEY`，并验证 `api.stlouisfed.org`。Polymarket 的 `gamma-api.polymarket.com` 是当前日期可用的补充来源。Yahoo 新闻的历史返回范围有限。 |
 | `sentiment` 社交情绪 | 需要可达 `api.stocktwits.com` 和 `www.reddit.com` 的 RSS。只有要启用 Jev 筛选时才配置 `TYPESAFE_API_KEY`，并准备 `api.typesafe.ai` 或自定义地址。 |
 | Alpha Vantage 数据源实验 | 需要 `ALPHA_VANTAGE_API_KEY` 和 `www.alphavantage.co` 出口，还要在 Python 配置 `data_vendors` 或 `tool_vendors`。用于所配置的分析工具，Yahoo 快照和结算仍需联网。 |
-| 改用托管模型 | 在 `.env.example` 中查所选 provider 的凭证。先确认模型支持工具调用和结构化输出，并确认自己接受提示词与行情上下文发送给该服务。 |
+| 改用托管模型 | 在 `.env.example` 中查所选 provider 的凭证。LongCat 的配置见下节。 |
 
 在需要时再填写对应凭证，避免将 `.env` 或密钥纳入实验归档。Yahoo 限流时，可以先做离线自检，等行情探针通过后再继续首轮。 [环境变量模板](.env.example) · [数据路由](tradingagents/dataflows/router.py) · [数据源实现](tradingagents/dataflows/vendors/) · [情绪筛选](tradingagents/agents/post_screen.py)
+
+## 7. 接入 LongCat API
+
+在 LongCat 平台创建 API Key。在仓库根目录的 `.env` 中填写密钥及下列配置。适配器使用官方 Responses API，端点已内置。 [LongCat 快速开始](https://longcat.chat/platform/docs/zh/) · [Responses API](https://longcat.chat/platform/docs/zh/api/responses)
+
+```dotenv
+LONGCAT_API_KEY=
+TRADINGAGENTS_LLM_PROVIDER=longcat
+TRADINGAGENTS_QUICK_THINK_LLM=LongCat-2.5
+TRADINGAGENTS_DEEP_THINK_LLM=LongCat-2.5
+TRADINGAGENTS_MODEL=longcat/LongCat-2.5
+```
+
+Python CLI 自动读取 `.env`。如果之前配置过 `TRADINGAGENTS_LLM_BACKEND_URL` 或独立的 `TRADINGAGENTS_*_THINK_PROVIDER`、`TRADINGAGENTS_*_THINK_BACKEND_URL`，清除遗留值，并检查当前 shell 中导出的同名变量。先跑一次历史分析，确认行情工具正常返回且最终评级可解析。
+
+```bash
+.venv/bin/python -m cli.main --ticker AAPL --date 2025-09-08 \
+  --analysts market --save --html --no-show
+```
+
+TypeScript CLI 可在构建后使用 Node 加载同一个 `.env`。用 `--model` 显式选择 LongCat，可覆盖 shell 中遗留的 `TRADINGAGENTS_BASE_URL` 选项。
+
+```bash
+node --env-file=.env dist/cli/main.js --model longcat/LongCat-2.5
+```
+
+分析提示和所用行情上下文会发给 LongCat，API 调用可能产生费用。Python 评级回测仍需要 Yahoo Finance 行情。切换模型做对照时，用新的 `--run-id` 和独立的决策记忆文件，避免混入上一轮的评级和复盘。 [行情验收](#5-验收标的和基准取数) · [TypeScript 模型配置](docs/models.md)
