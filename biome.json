@@ -9,6 +9,7 @@
       "!coverage",
       "!dist-bin",
       "!.archify",
+      "!docs/knowledge/tradingagents-runtime-workflows.html",
       "!tradingagents/assets/tauric-logo.svg",
       "!src/data/tauric/schema.generated.ts",
       "!src/data/tauric/applications.schema.generated.ts",
